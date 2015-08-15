@@ -61,11 +61,15 @@ function(CaneyAddLibrary _comp)
 		set_property(TARGET "caney-static-${_comp}" PROPERTY EXCLUDE_FROM_ALL ${CANEY_EXCLUDE_LIBRARY_FROM_ALL})
 		target_include_directories("caney-static-${_comp}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 		set_property(TARGET "caney-static-${_comp}" PROPERTY OUTPUT_NAME "caney_${_comp}")
+		set_property(TARGET "caney-static-${_comp}" PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
 
 		add_library("caney-shared-${_comp}" SHARED "$<TARGET_OBJECTS:caney-objects-${_comp}>")
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY EXCLUDE_FROM_ALL ${CANEY_EXCLUDE_LIBRARY_FROM_ALL})
 		target_include_directories("caney-shared-${_comp}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY OUTPUT_NAME "caney_${_comp}")
+		set_property(TARGET "caney-shared-${_comp}" PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
+		set_property(TARGET "caney-shared-${_comp}" PROPERTY SOVERSION ${caney_VERSION_MAJOR})
+		set_property(TARGET "caney-shared-${_comp}" PROPERTY VERSION ${caney_VERSION})
 
 		foreach(_dep ${args_DEPENDS})
 			if(NOT(TARGET "caney-objects-${_dep}"))
@@ -82,6 +86,15 @@ function(CaneyAddLibrary _comp)
 
 		set_property(TARGET "caney-static-${_comp}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES $<TARGET_PROPERTY:caney-objects-${_comp},INTERFACE_INCLUDE_DIRECTORIES>)
 		set_property(TARGET "caney-shared-${_comp}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES $<TARGET_PROPERTY:caney-objects-${_comp},INTERFACE_INCLUDE_DIRECTORIES>)
+
+		if(CANEY_INSTALL_STATIC)
+			install(TARGETS "caney-static-${_comp}"
+				ARCHIVE DESTINATION "${CANEY_INSTALL_LIB_DIR}")
+		endif()
+		if(CANEY_INSTALL_SHARED)
+			install(TARGETS "caney-shared-${_comp}"
+				LIBRARY DESTINATION "${CANEY_INSTALL_LIB_DIR}")
+		endif()
 	else()
 		# no source: provide a INTERFACE library
 		# also pull all dependencies (libs + include paths)
@@ -105,6 +118,10 @@ function(CaneyAddLibrary _comp)
 			target_link_libraries("caney-static-${_comp}" INTERFACE "caney-static-${_dep}")
 			target_link_libraries("caney-shared-${_comp}" INTERFACE "caney-shared-${_dep}")
 		endforeach()
+	endif()
+
+	if(CANEY_INSTALL_HEADERS AND args_HEADERS)
+		install(DIRECTORY include/ DESTINATION include)
 	endif()
 
 	if("SHARED" STREQUAL ${CANEY_LIBRARY_TYPE})
