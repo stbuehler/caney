@@ -1,0 +1,5 @@
+add_subdirectory(std)
+add_subdirectory(util)
+add_subdirectory(memory)
+add_subdirectory(streams)
+add_subdirectory(bencode)

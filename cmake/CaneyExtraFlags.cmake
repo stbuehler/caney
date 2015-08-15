@@ -1,0 +1,10 @@
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	set(CMAKE_EXTRA_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -pedantic" CACHE STRING "Extra flags used by the compiler")
+	set(CMAKE_EXTRA_EXE_LINKER_FLAGS "-Wl,--as-needed" CACHE STRING "Extra flags used by the linker")
+else()
+	set(CMAKE_EXTRA_CXX_FLAGS "" CACHE STRING "Extra flags used by the compiler")
+	set(CMAKE_EXTRA_EXE_LINKER_FLAGS "" CACHE STRING "Extra flags used by the linker")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_EXTRA_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXTRA_EXE_LINKER_FLAGS}")
