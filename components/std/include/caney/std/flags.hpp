@@ -165,7 +165,7 @@ namespace caney {
 			}
 
 			void clear() {
-				m_array = array_t{};
+				m_array = array_t{{}};
 			}
 
 			bool operator&=(flag_t) = delete;
@@ -221,7 +221,7 @@ namespace caney {
 			}
 
 			constexpr bool none() const {
-				return m_array == array_t{};
+				return m_array == array_t{{}};
 			}
 
 			constexpr bool any() const {
@@ -244,7 +244,7 @@ namespace caney {
 			}
 
 		private:
-			array_t m_array{};
+			array_t m_array{{}};
 		};
 	}
 } // namespace caney
