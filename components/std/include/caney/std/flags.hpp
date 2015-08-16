@@ -3,6 +3,7 @@
 #include <array>
 #include <cstdint>
 #include <limits>
+#include <climits>
 
 /* Usage:
  *
@@ -56,10 +57,17 @@ namespace caney {
 			static_assert(!std::numeric_limits<enum_t>::is_signed, "Only enums with unsigned underlying types allowed");
 			static_assert(std::numeric_limits<Elem>::is_integer, "Only unsigned integers allowed as underlying array elements for flags");
 			static_assert(!std::numeric_limits<Elem>::is_signed, "Only unsigned integers allowed as underlying array elements for flags");
-			static constexpr std::size_t BITS_PER_ELEM = sizeof(Elem)*8;
+
+			static_assert(8 == CHAR_BIT, "byte should have exactly 8 bits");
+			static constexpr std::size_t BITS_PER_ELEM = sizeof(Elem)*CHAR_BIT;
+
+			// how many array entries are needed to store all bits
 			static constexpr std::size_t ARRAY_SIZE = (Size + BITS_PER_ELEM - 1)/BITS_PER_ELEM;
-			static constexpr Elem LAST_ENTRY_MASK = ((Elem{1} << (Size % BITS_PER_ELEM)) - Elem{1});
 			static_assert(ARRAY_SIZE > 0, "Invalid array size");
+
+			// usable bits in the last entry
+			static constexpr Elem LAST_ENTRY_MASK = (Size % BITS_PER_ELEM == 0) ? ~Elem{0} : ((Elem{1} << (Size % BITS_PER_ELEM)) - Elem{1});
+
 			typedef std::array<Elem, ARRAY_SIZE> array_t;
 			typedef FlagEnum flag_t;
 

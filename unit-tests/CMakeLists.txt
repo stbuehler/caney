@@ -1,7 +1,7 @@
 add_executable(flags_test
 	flags_test.cpp
 )
-target_link_libraries(flags_test PRIVATE caney::std)
+target_link_libraries(flags_test PRIVATE caney::std caney::boost_unit_test)
 add_test(NAME flags COMMAND flags_test)
 
 add_executable(weakfn_test
