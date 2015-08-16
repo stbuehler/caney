@@ -136,10 +136,10 @@ namespace caney {
 				return shared_functor_fn<shared_ptr_traits<Pointer>, Result, Functor, Args...>(func);
 			}
 
-			template<template<typename T> class /* SharedPtr */, typename Functor, typename Call = decltype(&Functor::operator())>
+			template<template<typename T> class /* SharedPtr */, typename Functor>
 			auto make_shared_fn(Functor const& func)
-					-> decltype(make_functor_fn(func, Call{nullptr})) {
-				return make_functor_fn(func, Call{nullptr});
+					-> decltype(make_functor_fn(func, &Functor::operator())) {
+				return make_functor_fn(func, &Functor::operator());
 			}
 
 			template<typename SharedPtrTraits, typename Result, typename Function, typename... Args>
