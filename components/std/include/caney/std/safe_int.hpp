@@ -1,7 +1,8 @@
 #pragma once
 
-#include <limits>
+#include "compiler_features.hpp"
 
+#include <limits>
 #include <stdexcept>
 
 // boost::numeric_cast
@@ -23,7 +24,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_add(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_add(Int const a, Int const b) {
 					using std::to_string;
 					if (a >= 0) {
 						/* HAVE: a+b >= b >= min(), 0 <= (max() - a) <= max(), CHECK: a + b <= max() */
@@ -36,7 +37,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_add(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_add(Int const a, Int const b) {
 					using std::to_string;
 					/* unsigned variant: always a >= 0: */
 					/* HAVE: a+b >= b >= min(), 0 <= (max() - a) <= max(), CHECK: a + b <= max() */
@@ -45,7 +46,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_sub(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_sub(Int const a, Int const b) {
 					using std::to_string;
 					if (b < 0) {
 						if (a > max() + b) throw std::overflow_error(std::string(__func__) + ": subtraction positive overflow: " + to_string(a) + " - " + to_string(b));
@@ -56,7 +57,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_sub(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_sub(Int const a, Int const b) {
 					using std::to_string;
 					/* unsigned variant: always b >= 0: */
 					if (a < min() + b) throw std::overflow_error(std::string(__func__) + ": subtraction negative overflow: " + to_string(a) + " - " + to_string(b));
@@ -64,7 +65,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_mul(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_mul(Int const a, Int const b) {
 					using std::to_string;
 					if (0 == a || 0 == b) return a*b;
 					if (a < 0) {
@@ -86,7 +87,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_mul(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_mul(Int const a, Int const b) {
 					using std::to_string;
 					if (0 == a || 0 == b) return a*b;
 					/* unsigned variant: always a > 0 && b > 0: */
@@ -95,7 +96,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_div(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_div(Int const a, Int const b) {
 					using std::to_string;
 					if (a == min() && (b < 0 && b == Int{-1})) std::overflow_error(std::string(__func__) + ": division negative overflow: " + to_string(a) + " / " + to_string(b));
 					if (0 == b) throw std::overflow_error(std::string(__func__) + ": division by zero: " + to_string(a) + " / " + to_string(b));
@@ -103,7 +104,7 @@ namespace caney {
 				}
 
 				template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
-				static constexpr Int checked_div(Int const a, Int const b) {
+				static CANEY_RELAXED_CONSTEXPR Int checked_div(Int const a, Int const b) {
 					using std::to_string;
 					/* unsigned variant: always b >= 0 */
 					if (0 == b) throw std::overflow_error(std::string(__func__) + ": division by zero: " + to_string(a) + " / " + to_string(b));

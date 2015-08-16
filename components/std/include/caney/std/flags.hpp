@@ -1,5 +1,7 @@
 #pragma once
 
+#include "compiler_features.hpp"
+
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -132,17 +134,17 @@ namespace caney {
 				return reference(m_array[flagNdx / BITS_PER_ELEM], mask);
 			}
 
-			constexpr bool operator[](flag_t flag) const {
+			CANEY_RELAXED_CONSTEXPR bool operator[](flag_t flag) const {
 				size_t flagNdx{static_cast<enum_t>(flag)};
 				Elem const mask = Elem{1} << (flagNdx % BITS_PER_ELEM);
 				return 0 != (m_array[flagNdx / BITS_PER_ELEM] & mask);
 			}
 
-			bool operator==(flags const& other) const {
+			constexpr bool operator==(flags const& other) const {
 				return m_array == other.m_array;
 			}
 
-			bool operator!=(flags const& other) const {
+			constexpr bool operator!=(flags const& other) const {
 				return m_array != other.m_array;
 			}
 
@@ -177,7 +179,7 @@ namespace caney {
 				}
 				return *this;
 			}
-			constexpr flags operator&(flags const& other) const { flags tmp(*this); tmp &= other; return tmp; }
+			CANEY_RELAXED_CONSTEXPR flags operator&(flags const& other) const { flags tmp(*this); tmp &= other; return tmp; }
 
 			flags& operator|=(flag_t flag) {
 				set(flag);
@@ -190,7 +192,7 @@ namespace caney {
 				}
 				return *this;
 			}
-			constexpr flags operator|(flags const& other) const { flags tmp(*this); tmp |= other; return tmp; }
+			CANEY_RELAXED_CONSTEXPR flags operator|(flags const& other) const { flags tmp(*this); tmp |= other; return tmp; }
 
 			flags& operator^=(flag_t flag) {
 				flip(flag);
@@ -203,9 +205,9 @@ namespace caney {
 				}
 				return *this;
 			}
-			constexpr flags operator^(flags const& other) const { flags tmp(*this); tmp ^= other; return tmp; }
+			CANEY_RELAXED_CONSTEXPR flags operator^(flags const& other) const { flags tmp(*this); tmp ^= other; return tmp; }
 
-			constexpr flags operator~() const {
+			CANEY_RELAXED_CONSTEXPR flags operator~() const {
 				flags tmp(*this);
 				tmp.flip_all();
 				return tmp;
@@ -226,7 +228,7 @@ namespace caney {
 				return !none();
 			}
 
-			constexpr bool all() const {
+			CANEY_RELAXED_CONSTEXPR bool all() const {
 				for (size_t i = 0; i < ARRAY_SIZE - 1; ++i) {
 					if (0 != ~m_array[i]) return false;
 				}
