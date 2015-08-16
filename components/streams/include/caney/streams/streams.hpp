@@ -114,9 +114,6 @@ namespace caney {
 				template<typename Source, typename Sink>
 				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
 
-				template<typename Source, typename Sink>
-				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
-
 				// source might be the origin itself: don't keep itself alive here
 				std::weak_ptr<origin> m_origin;
 			};
