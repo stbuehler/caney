@@ -1,19 +1,25 @@
 #pragma once
 
+#include "compiler_features.hpp"
+#include "enum_helper.hpp"
+
 #include <array>
+#include <limits>
+#include <tuple>
 
 namespace caney {
 	inline namespace stdv1 {
-		template<typename Enum, std::size_t SIZE, typename T>
+		template<typename Enum, typename Value, std::size_t SIZE = static_cast<std::size_t>(Enum::Last) + 1>
 		class enum_array {
+		public:
+			static_assert(!std::numeric_limits<std::underlying_type_t<Enum>>::is_signed, "only unsigned index enum types allowed");
+			using array_type = std::array<Value, SIZE>;
 		private:
-			using array_type = std::array<T, SIZE>;
+			// required early to be in scope for noexcept(...)
+			array_type m_array;
 
 		public:
 			using enum_type = Enum;
-
-			// array element is public
-			array_type array;
 
 			// import std::array
 			using value_type = typename array_type::value_type;
@@ -28,83 +34,95 @@ namespace caney {
 			using reverse_iterator = typename array_type::reverse_iterator;
 			using const_reverse_iterator = typename array_type::const_reverse_iterator;
 
+			explicit enum_array()
+			: m_array{{}} {
+			}
+
+			explicit enum_array(array_type array) {
+				m_array = std::move(array);
+			}
+
+			enum_array(enum_array const&) = default;
+			enum_array& operator=(enum_array const&) = default;
+			enum_array(enum_array&&) = default;
+			enum_array& operator=(enum_array&&) = default;
+
+			// explicit construct from mutable reference, otherwise sometimes the perfect-forward constructor wins the overload
+			enum_array(enum_array&) = default;
+
+			// somehow this seems to overload the "mutable reference" copy constructor.
 			template<typename... Args>
-			enum_array(Args&&... args)
-			: array{{std::forward<Args>(args)...}} {
+			explicit enum_array(Args&&... args)
+			: m_array{{std::forward<Args>(args)...}} {
+				static_assert(std::tuple_size<std::tuple<Args...>>::value == SIZE, "must initialize all entries");
+			}
+
+			CANEY_RELAXED_CONSTEXPR array_type& array() & {
+				return m_array;
+			}
+
+			constexpr array_type const& array() const& {
+				return m_array;
+			}
+
+			CANEY_RELAXED_CONSTEXPR array_type&& array() && {
+				return std::move(m_array);
 			}
 
 			// forward almost all std::array
-			void fill(const value_type& value) { array.fill(value); }
-			void swap(enum_array& other) noexcept(noexcept(array.swap(other.array))) { array.swap(other.array); }
-			iterator begin() noexcept { return array.begin(); }
-			const_iterator begin() const noexcept { return array.begin(); }
-			iterator end() noexcept { return array.end(); }
-			const_iterator end() const noexcept { return array.end(); }
-			reverse_iterator rbegin() noexcept { return array.rbegin(); }
-			const_reverse_iterator rbegin() const noexcept { return array.rbegin(); }
-			reverse_iterator rend() noexcept { return array.rend(); }
-			const_reverse_iterator rend() const noexcept { return array.rend(); }
-			const_iterator cbegin() const noexcept { return array.cbegin(); }
-			const_iterator cend() const noexcept { return array.cend(); }
-			const_reverse_iterator crbegin() const noexcept { return array.crbegin(); }
-			const_reverse_iterator crend() const noexcept { return array.crend(); }
-			constexpr size_type size() const noexcept { return array.size(); }
-			constexpr size_type max_size() const noexcept { return array.max_size(); }
+			void fill(const value_type& value) { m_array.fill(value); }
+			void swap(enum_array& other) noexcept(noexcept(m_array.swap(other.m_array))) { m_array.swap(other.m_array); }
+			iterator begin() noexcept { return m_array.begin(); }
+			const_iterator begin() const noexcept { return m_array.begin(); }
+			iterator end() noexcept { return m_array.end(); }
+			const_iterator end() const noexcept { return m_array.end(); }
+			reverse_iterator rbegin() noexcept { return m_array.rbegin(); }
+			const_reverse_iterator rbegin() const noexcept { return m_array.rbegin(); }
+			reverse_iterator rend() noexcept { return m_array.rend(); }
+			const_reverse_iterator rend() const noexcept { return m_array.rend(); }
+			const_iterator cbegin() const noexcept { return m_array.cbegin(); }
+			const_iterator cend() const noexcept { return m_array.cend(); }
+			const_reverse_iterator crbegin() const noexcept { return m_array.crbegin(); }
+			const_reverse_iterator crend() const noexcept { return m_array.crend(); }
+			constexpr size_type size() const noexcept { return m_array.size(); }
+			constexpr size_type max_size() const noexcept { return m_array.max_size(); }
 			constexpr bool empty() const noexcept { return size() == 0; }
-			reference front() noexcept { return array.front(); }
-			constexpr const_reference front() const noexcept { return array.front(); }
-			reference back() noexcept { return array.back(); }
-			constexpr const_reference back() const noexcept { return array.back(); }
-			pointer data() noexcept { return array.data(); }
-			const_pointer data() const noexcept { return array.data(); }
+			reference front() noexcept { return m_array.front(); }
+			constexpr const_reference front() const noexcept { return m_array.front(); }
+			reference back() noexcept { return m_array.back(); }
+			constexpr const_reference back() const noexcept { return m_array.back(); }
+			pointer data() noexcept { return m_array.data(); }
+			const_pointer data() const noexcept { return m_array.data(); }
 
 			// offer index operations by std::size_t as std::array
-			reference operator[](size_type n) noexcept { return array[n]; }
-			constexpr const_reference operator[](size_type n) const noexcept { return array[n]; }
-			reference at(size_type n) { return array.at(n); }
-			constexpr const_reference at(size_type n) const { return array.at(n); }
+			reference operator[](size_type n) noexcept { return m_array[n]; }
+			constexpr const_reference operator[](size_type n) const noexcept { return m_array[n]; }
+			reference at(size_type n) { return m_array.at(n); }
+			constexpr const_reference at(size_type n) const { return m_array.at(n); }
 
 			// offer index operations by enum type
-			reference operator[](enum_type n) noexcept { return array[size_type(n)]; }
-			constexpr const_reference operator[](enum_type n) const noexcept { return array[size_type(n)]; }
-			reference at(enum_type n) { return array.at(size_typ(n)); }
-			constexpr const_reference at(enum_type n) const { return array.at(size_type(n)); }
+			reference operator[](enum_type n) noexcept { return m_array[size_type{caney::from_enum(n)}]; }
+			constexpr const_reference operator[](enum_type n) const noexcept { return m_array[size_type{caney::from_enum(n)}]; }
+			reference at(enum_type n) { return m_array.at(size_type{caney::from_enum(n)}); }
+			constexpr const_reference at(enum_type n) const { return m_array.at(size_type{caney::from_enum(n)}); }
 
 			template<enum_type Index>
-			constexpr value_type& get() & { return std::get<size_type(Index)>(array); }
+			CANEY_RELAXED_CONSTEXPR value_type& get() & { return std::get<size_type{caney::from_enum(Index)}>(m_array); }
 
 			template<enum_type Index>
-			constexpr value_type const& get() const& { return std::get<size_type(Index)>(array); }
+			constexpr value_type const& get() const& { return std::get<size_type{caney::from_enum(Index)}>(m_array); }
 
 			template<enum_type Index>
-			constexpr value_type&& get() && { return std::get<size_type(Index)>(std::move(array)); }
+			CANEY_RELAXED_CONSTEXPR value_type&& get() && { return std::get<size_type{caney::from_enum(Index)}>(std::move(m_array)); }
+
+			friend bool operator==(const enum_array& a, const enum_array& b) { return a.m_array == b.m_array; }
+			friend bool operator!=(const enum_array& a, const enum_array& b) { return a.m_array != b.m_array; }
+			friend bool operator< (const enum_array& a, const enum_array& b) { return a.m_array <  b.m_array; }
+			friend bool operator<=(const enum_array& a, const enum_array& b) { return a.m_array <= b.m_array; }
+			friend bool operator> (const enum_array& a, const enum_array& b) { return a.m_array >  b.m_array; }
+			friend bool operator>=(const enum_array& a, const enum_array& b) { return a.m_array >= b.m_array; }
+
+			friend void swap(enum_array& a, enum_array& b) noexcept(noexcept(a.swap(b))) { a.swap(b); }
 		};
-
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator==(const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array == b.array; }
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator!=(const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array != b.array; }
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator< (const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array <  b.array; }
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator<=(const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array <= b.array; }
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator> (const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array >  b.array; }
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline bool operator>=(const enum_array<Enum, SIZE, T>& a, const enum_array<Enum, SIZE, T>& b) { return a.array >= b.array; }
-
-		template<typename Enum, std::size_t SIZE, typename T>
-		inline void swap(enum_array<Enum, SIZE, T>& a, enum_array<Enum, SIZE, T>& b) noexcept(noexcept(a.swap(b))) { a.swap(b); }
 	}
 } // namespace caney
-
-namespace std {
-	template<typename Enum, std::size_t SIZE, typename T, Enum Index>
-	constexpr T& get(caney::enum_array<Enum, SIZE, T>& arr) { return std::get<size_type(Index)>(arr.array); }
-
-	template<typename Enum, std::size_t SIZE, typename T, Enum Index>
-	constexpr T const& get(caney::enum_array<Enum, SIZE, T> const& arr) { return std::get<size_type(Index)>(arr.array); }
-
-	template<typename Enum, std::size_t SIZE, typename T, Enum Index>
-	constexpr T&& get(caney::enum_array<Enum, SIZE, T>&& arr) { return std::get<size_type(Index)>(std::move(arr.array)); }
-} // namespace std
