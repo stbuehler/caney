@@ -48,11 +48,14 @@ unset(CANEY_BUILD_TESTS) # unset local variable, use cache var
 set(CANEY_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE INTERNAL "caney source directory")
 set(CANEY_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE INTERNAL "caney binary directory")
 
-add_subdirectory(components)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
+
 if(CANEY_TOP)
 	# don't build unit tests when embedded in other projects
 	enable_testing()
-	add_subdirectory(unit-tests)
 endif()
+add_subdirectory(components)
 
 add_custom_target("caney-other-texts" SOURCES README.md SOURCE.md COPYING)

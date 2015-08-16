@@ -1,1 +1,1 @@
-CaneyAddLibrary(bencode SOURCES auto HEADERS auto DEPENDS memory util)
+CaneyAddLibrary(bencode SOURCES auto HEADERS auto TESTS auto DEPENDS memory util)

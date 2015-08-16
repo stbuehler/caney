@@ -1,1 +1,1 @@
-CaneyAddLibrary(util SOURCES auto HEADERS auto DEPENDS std)
+CaneyAddLibrary(util SOURCES auto HEADERS auto TESTS auto DEPENDS std)

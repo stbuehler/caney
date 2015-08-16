@@ -17,8 +17,3 @@ endfunction()
 _CaneyAddBoostCompoment(system)
 _CaneyAddBoostCompoment(thread system)
 _CaneyAddBoostCompoment(unit_test_framework system)
-
-# provide a special import "caney::boost_unit_test": "caney::boost::unit_test_framework" + some compile definitions
-add_library("caney::boost_unit_test" INTERFACE IMPORTED GLOBAL)
-set_property(TARGET "caney::boost_unit_test" APPEND PROPERTY INTERFACE_LINK_LIBRARIES "caney::boost::unit_test_framework")
-set_property(TARGET "caney::boost_unit_test" APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS BOOST_TEST_MAIN BOOST_TEST_DYN_LINK)

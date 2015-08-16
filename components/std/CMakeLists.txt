@@ -1,1 +1,1 @@
-CaneyAddLibrary(std SOURCES auto HEADERS auto LINK caney::boost::thread)
+CaneyAddLibrary(std SOURCES auto HEADERS auto TESTS auto LINK caney::boost::thread)

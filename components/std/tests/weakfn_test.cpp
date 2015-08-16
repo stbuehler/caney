@@ -30,7 +30,7 @@ public:
 	int m_value;
 };
 
-static void test_std() {
+void test_weakfn_std() {
 	auto l_test = [](std::shared_ptr<int> ref, int inc) { test_call_std(ref, inc); };
 
 	auto pi = std::make_shared<int>(10);
@@ -62,7 +62,7 @@ static void test_std() {
 	caney::weak_fn(&foo::bar2, pconstfoo)();
 }
 
-static void test_boost() {
+void test_weakfn_boost() {
 	auto l_test = [](boost::shared_ptr<int> ref, int inc) { test_call_boost(ref, inc); };
 
 	auto pi = boost::make_shared<int>(10);
@@ -92,11 +92,4 @@ static void test_boost() {
 	caney::weak_fn(&test_call_boost, pi)(5);
 	caney::weak_fn(&foo::bar1, pfoo)(7);
 	caney::weak_fn(&foo::bar2, pconstfoo)();
-}
-
-int main() {
-	test_std();
-	test_boost();
-
-	return 0;
 }

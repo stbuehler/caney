@@ -27,18 +27,21 @@ endmacro()
 #	LINK other targets the interface depends on
 #	PRIVATE_LINK other targets the implementation depends on
 function(CaneyAddLibrary _comp)
-	cmake_parse_arguments(args "" "" "HEADERS;SOURCES;DEPENDS;LINK;PRIVATE_LINK" ${ARGN})
+	cmake_parse_arguments(args "" "" "HEADERS;SOURCES;TESTS;DEPENDS;LINK;PRIVATE_LINK" ${ARGN})
 	if(args_UNPARSED_ARGUMENTS)
 		message(FATAL_ERROR "CaneyAddLibrary: unknown arguments '${args_UNPARSED_ARGUMENTS}'")
 	endif()
 
 	# message(STATUS "CaneyAddLibrary ${_comp}: headers '${args_HEADERS}', sources '${args_SOURCES}', depends '${args_DEPENDS}', links '${args_LINK}', private links '${args_PRIVATE_LINK}'")
 
-	file(GLOB_RECURSE glob_headers RELATIVE "${CMAKE_CURRENT_SOURCE}" include/*.h include/*.hpp include/*.inc)
+	file(GLOB_RECURSE glob_headers RELATIVE "${CMAKE_CURRENT_SOURCE}" include/*.h include/*.hpp)
 	_CaneyGlobFiles("header" glob_headers args_HEADERS)
 
 	file(GLOB_RECURSE glob_sources RELATIVE "${CMAKE_CURRENT_SOURCE}" src/*.cpp)
 	_CaneyGlobFiles("source" glob_sources args_SOURCES)
+
+	file(GLOB_RECURSE glob_tests RELATIVE "${CMAKE_CURRENT_SOURCE}" tests/*.cpp tests/*.h tests/*.hpp)
+	_CaneyGlobFiles("tests" glob_tests args_TESTS)
 
 	set(_target "caney-${_comp}")
 
@@ -61,13 +64,11 @@ function(CaneyAddLibrary _comp)
 		set_property(TARGET "caney-static-${_comp}" PROPERTY EXCLUDE_FROM_ALL ${CANEY_EXCLUDE_LIBRARY_FROM_ALL})
 		target_include_directories("caney-static-${_comp}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 		set_property(TARGET "caney-static-${_comp}" PROPERTY OUTPUT_NAME "caney_${_comp}")
-		set_property(TARGET "caney-static-${_comp}" PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
 
 		add_library("caney-shared-${_comp}" SHARED "$<TARGET_OBJECTS:caney-objects-${_comp}>")
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY EXCLUDE_FROM_ALL ${CANEY_EXCLUDE_LIBRARY_FROM_ALL})
 		target_include_directories("caney-shared-${_comp}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY OUTPUT_NAME "caney_${_comp}")
-		set_property(TARGET "caney-shared-${_comp}" PROPERTY LIBRARY_OUTPUT_DIRECTORY "${CANEY_BINARY_DIR}")
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY SOVERSION ${caney_VERSION_MAJOR})
 		set_property(TARGET "caney-shared-${_comp}" PROPERTY VERSION ${caney_VERSION})
 
@@ -128,5 +129,17 @@ function(CaneyAddLibrary _comp)
 		add_library("caney::${_comp}" ALIAS "caney-shared-${_comp}")
 	else()
 		add_library("caney::${_comp}" ALIAS "caney-static-${_comp}")
+	endif()
+
+	if(CANEY_TOP AND args_TESTS)
+		set(CANEY_COMPONENT "${_comp}")
+		configure_file("${CANEY_SOURCE_DIR}/cmake/template-run-boost-unit-test.cpp" "run-boost-unit-test.cpp")
+
+		add_executable("caney-test-${_comp}"
+			${args_TESTS}
+			"${CMAKE_CURRENT_BINARY_DIR}/run-boost-unit-test.cpp"
+		)
+		target_link_libraries("caney-test-${_comp}" PRIVATE "caney::${_comp}" caney::boost::unit_test_framework)
+		add_test(NAME "caney-${_comp}" COMMAND "caney-test-${_comp}")
 	endif()
 endfunction()
