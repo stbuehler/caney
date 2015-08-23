@@ -22,6 +22,9 @@ enum class enum3 : uint8_t {
 	value255 = 255,
 };
 
+static_assert(std::is_same<decltype(from_enum(enum2::value0)), int8_t>::value, "from_enum return value matches underlying type");
+static_assert(std::is_same<decltype(from_enum(enum3::value0)), uint8_t>::value, "from_enum return value matches underlying type");
+
 BOOST_AUTO_TEST_CASE(test1) {
 	BOOST_CHECK_EQUAL(from_enum(enum1::value0), 0);
 	BOOST_CHECK_EQUAL(from_enum(enum1::value255), 255);

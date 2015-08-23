@@ -82,17 +82,28 @@ namespace caney {
 				: m_value(std::move(from.synchronize().get())) {
 				}
 
-				template<bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
-					typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign>
-				synchronized& operator=(synchronized<value_type, FromMutex, FromSharedLock, FromLock, FromAllowAssign> const& other) {
+				template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
+					typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
+				typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+				synchronized& operator=(synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign> const& other) {
 					auto tmp = other.shared_synchronize().get();
 					synchronize().get() = std::move(tmp);
 					return *this;
 				}
 
-				template<bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
-					typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign>
-				synchronized& operator=(synchronized<value_type, FromMutex, FromSharedLock, FromLock, FromAllowAssign>&& other) {
+				template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
+					typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
+				typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+				synchronized& operator=(synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign>& other) {
+					auto tmp = other.shared_synchronize().get();
+					synchronize().get() = std::move(tmp);
+					return *this;
+				}
+
+				template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
+					typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
+				typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+				synchronized& operator=(synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign>&& other) {
 					auto tmp = std::move(other.synchronize().get());
 					synchronize().get() = std::move(tmp);
 					return *this;
