@@ -189,5 +189,5 @@ namespace caney {
 				return allocate_fixed_intrusive<T, Alloc>(Alloc(), std::forward<Args>(args)...);
 			}
 		}
-	}
-}
+	} // namespace memory
+} // namespace caney

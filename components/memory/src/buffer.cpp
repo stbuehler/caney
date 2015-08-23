@@ -78,5 +78,5 @@ namespace caney {
 				return unique_buf(storage, storage.get(), size);
 			}
 		}
-	}
-}
+	} // namespace memory
+} // namespace caney

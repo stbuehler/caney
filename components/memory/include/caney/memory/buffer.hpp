@@ -5,6 +5,8 @@
 #include <type_traits>
 #include <vector>
 
+// #include <boost/variant/variant.hpp>
+
 namespace boost {
 	namespace asio {
 		class const_buffer;
@@ -202,6 +204,9 @@ namespace caney {
 
 			class shared_const_buf final: public const_buf {
 			public:
+				// typedef boost::variant<std::shared_ptr<void>> storage_t;
+				typedef std::shared_ptr<void> storage_t;
+
 				explicit shared_const_buf() = default;
 				shared_const_buf(shared_const_buf const& other)
 				: const_buf(), m_storage(other.m_storage) {
@@ -219,8 +224,8 @@ namespace caney {
 				template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
 				explicit shared_const_buf(Container&& data) {
 					std::shared_ptr<Container> storage = std::make_shared<Container>(std::move(data));
-					m_storage = storage;
 					raw_set(Storage::data(*storage), Storage::size(*storage));
+					m_storage = std::move(storage);
 				}
 
 				static shared_const_buf copy(unsigned char const* data, std::size_t size);
@@ -236,23 +241,23 @@ namespace caney {
 					return copy(Storage::data(data), Storage::size(data));
 				}
 
-				static shared_const_buf unsafe_use(std::shared_ptr<void> storage, const_buf const& buffer) {
+				static shared_const_buf unsafe_use(storage_t storage, const_buf const& buffer) {
 					return shared_const_buf(std::move(storage), buffer);
 				}
 
-				std::shared_ptr<void> storage() const { return m_storage; }
+				storage_t storage() const { return m_storage; }
 
 			private:
 				shared_const_buf internal_shared_slice(size_t from, size_t size) const override {
 					return unsafe_use(m_storage, raw_slice(from, size));
 				}
 
-				explicit shared_const_buf(std::shared_ptr<void> storage, const_buf const& buffer)
+				explicit shared_const_buf(storage_t storage, const_buf const& buffer)
 				: m_storage(storage) {
 					raw_set(buffer);
 				}
 
-				std::shared_ptr<void> m_storage; // pointer value is ignored
+				storage_t m_storage; // pointer value is ignored
 			};
 
 			// (potentially sliced) reference to a const_buf, inheriting the original internal_shared_slice() method

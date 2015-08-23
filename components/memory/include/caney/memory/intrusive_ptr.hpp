@@ -267,5 +267,5 @@ namespace caney {
 				return intrusive_ptr<U, Alloc>(const_cast<U>(r.get()));
 			}
 		}
-	}
-}
+	} // namespace memory
+} // namespace caney
