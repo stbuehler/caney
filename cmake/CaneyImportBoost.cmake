@@ -17,3 +17,11 @@ endfunction()
 _CaneyAddBoostCompoment(system)
 _CaneyAddBoostCompoment(thread system)
 _CaneyAddBoostCompoment(unit_test_framework system)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	set(CANEY_BOOST_LINK_THREAD_SUPPORT "pthread" CACHE STRING "extra libraries to link for thread support")
+else()
+	set(CANEY_BOOST_LINK_THREAD_SUPPORT "" CACHE STRING "extra libraries to link for thread support")
+endif()
+
+target_link_libraries("caney::boost::thread" INTERFACE ${CANEY_BOOST_LINK_THREAD_SUPPORT})
