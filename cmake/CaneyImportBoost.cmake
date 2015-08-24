@@ -1,7 +1,7 @@
 find_package(Boost REQUIRED COMPONENTS system thread unit_test_framework)
 
 # extra arguments: dependencies on other boost components
-function(_CaneyAddBoostCompoment _comp)
+function(_caney_add_boost_compoment _comp)
 	string(TOUPPER "${_comp}" _upperComp)
 	# message(STATUS "Importing caney::boost::${_comp}, depending on '${ARGN}' boost components, located at '${Boost_${_upperComp}_LIBRARY_RELEASE}', includes in '${Boost_INCLUDE_DIR}'")
 
@@ -14,9 +14,9 @@ function(_CaneyAddBoostCompoment _comp)
 	endforeach()
 endfunction()
 
-_CaneyAddBoostCompoment(system)
-_CaneyAddBoostCompoment(thread system)
-_CaneyAddBoostCompoment(unit_test_framework system)
+_caney_add_boost_compoment(system)
+_caney_add_boost_compoment(thread system)
+_caney_add_boost_compoment(unit_test_framework system)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(CANEY_BOOST_LINK_THREAD_SUPPORT "pthread" CACHE STRING "extra libraries to link for thread support")

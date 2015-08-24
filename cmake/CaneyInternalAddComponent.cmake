@@ -3,7 +3,7 @@ include(CMakeParseArguments)
 set(CANEY_LIBRARY_TYPE "STATIC" CACHE STRING "use static/shared libraries by default")
 set_property(CACHE CANEY_LIBRARY_TYPE PROPERTY STRINGS "STATIC;SHARED")
 
-macro(_CaneyGlobFiles _type _glob_var _define_var)
+macro(_caney_glob_files _type _glob_var _define_var)
 	# message(STATUS "for ${_type} got defined '${${_define_var}}' (${_define_var})")
 	if("${${_define_var}}" STREQUAL "auto")
 		set(${_define_var} ${${_glob_var}})
@@ -20,28 +20,28 @@ macro(_CaneyGlobFiles _type _glob_var _define_var)
 	endif()
 endmacro()
 
-# CaneyAddLibrary(component <....>)
+# caney_add_library(component <....>)
 #	HEADERS header files...
 #	SOURCES sources files...
 #	DEPENDS caney components to depend on (must be defined before)
 #	LINK other targets the interface depends on
 #	PRIVATE_LINK other targets the implementation depends on
-function(CaneyAddLibrary _comp)
+function(caney_add_library _comp)
 	cmake_parse_arguments(args "" "" "HEADERS;SOURCES;TESTS;DEPENDS;LINK;PRIVATE_LINK" ${ARGN})
 	if(args_UNPARSED_ARGUMENTS)
-		message(FATAL_ERROR "CaneyAddLibrary: unknown arguments '${args_UNPARSED_ARGUMENTS}'")
+		message(FATAL_ERROR "caney_add_library: unknown arguments '${args_UNPARSED_ARGUMENTS}'")
 	endif()
 
-	# message(STATUS "CaneyAddLibrary ${_comp}: headers '${args_HEADERS}', sources '${args_SOURCES}', depends '${args_DEPENDS}', links '${args_LINK}', private links '${args_PRIVATE_LINK}'")
+	# message(STATUS "caney_add_library ${_comp}: headers '${args_HEADERS}', sources '${args_SOURCES}', depends '${args_DEPENDS}', links '${args_LINK}', private links '${args_PRIVATE_LINK}'")
 
 	file(GLOB_RECURSE glob_headers RELATIVE "${CMAKE_CURRENT_SOURCE}" include/*.h include/*.hpp)
-	_CaneyGlobFiles("header" glob_headers args_HEADERS)
+	_caney_glob_files("header" glob_headers args_HEADERS)
 
 	file(GLOB_RECURSE glob_sources RELATIVE "${CMAKE_CURRENT_SOURCE}" src/*.cpp)
-	_CaneyGlobFiles("source" glob_sources args_SOURCES)
+	_caney_glob_files("source" glob_sources args_SOURCES)
 
 	file(GLOB_RECURSE glob_tests RELATIVE "${CMAKE_CURRENT_SOURCE}" tests/*.cpp tests/*.h tests/*.hpp)
-	_CaneyGlobFiles("tests" glob_tests args_TESTS)
+	_caney_glob_files("tests" glob_tests args_TESTS)
 
 	set(_target "caney-${_comp}")
 
