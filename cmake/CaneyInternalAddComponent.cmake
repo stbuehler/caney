@@ -106,6 +106,9 @@ function(caney_add_library _comp)
 		target_include_directories("caney-objects-${_comp}" INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 		target_link_libraries("caney-objects-${_comp}" INTERFACE ${args_PRIVATE_LINK} ${args_LINK})
 
+		# make the files show up in qtcreator; target_sources doesn't seem to do the trick here.
+		add_custom_target("caney-objects-${_comp}-headers" SOURCES ${args_HEADERS})
+
 		add_library("caney-static-${_comp}" INTERFACE)
 		target_link_libraries("caney-static-${_comp}" INTERFACE "caney-objects-${_comp}")
 
