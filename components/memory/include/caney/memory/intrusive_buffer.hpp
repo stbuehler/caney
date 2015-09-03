@@ -103,14 +103,12 @@ namespace caney {
 			}
 
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_add_ref(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT
-			{
+			inline void intrusive_ptr_add_ref(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
 				CounterPolicyT::increment(p->m_ref_counter);
 			}
 
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_release(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT
-			{
+			inline void intrusive_ptr_release(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
 				try {
 					if (CounterPolicyT::decrement(p->m_ref_counter) == 0) {
 						typedef intrusive_buffer<AllocatorT, CounterPolicyT> buffer_t;
