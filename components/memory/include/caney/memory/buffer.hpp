@@ -263,6 +263,8 @@ namespace caney {
 			// (potentially sliced) reference to a const_buf, inheriting the original internal_shared_slice() method
 			class tmp_const_buf final: public const_buf {
 			public:
+				explicit tmp_const_buf() = default;
+
 				explicit tmp_const_buf(const_buf const& backend)
 				: m_backend(&backend) {
 					raw_set(backend);
@@ -282,8 +284,22 @@ namespace caney {
 					raw_set(other);
 					return *this;
 				}
-				tmp_const_buf(tmp_const_buf&&) = default;
-				tmp_const_buf& operator=(tmp_const_buf&&) = default;
+				tmp_const_buf(tmp_const_buf&& other)
+				: const_buf(), m_backend(other.m_backend) {
+					raw_set(other);
+					other.reset();
+				}
+				tmp_const_buf& operator=(tmp_const_buf&& other) {
+					m_backend = other.m_backend;
+					raw_set(other);
+					other.reset();
+					return *this;
+				}
+
+				void reset() {
+					raw_reset();
+					m_backend = nullptr;
+				}
 
 				tmp_const_buf slice(size_type from, size_type size) const {
 					return tmp_const_buf(*m_backend, raw_slice(from, size));
@@ -297,6 +313,7 @@ namespace caney {
 
 			private:
 				virtual shared_const_buf internal_shared_slice(size_t from, size_t size) const {
+					if (!m_backend) return shared_const_buf();
 					size_t inner_from = data() - m_backend->data();
 					return m_backend->shared_slice(inner_from + from, size);
 				}
