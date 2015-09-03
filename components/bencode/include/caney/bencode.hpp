@@ -56,7 +56,7 @@ namespace caney {
 			struct parser;
 			/* {
 			 *     // return parsed value if successful; also must remove parsed data from buf
-			 *     static boost::optional<Result> parse(memory::shared_const_buffer& buf);
+			 *     static boost::optional<Result> parse(memory::shared_const_buf& buf);
 			 * };
 			 */
 
