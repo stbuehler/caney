@@ -2,6 +2,7 @@
 
 #include "caney/std/private.hpp"
 
+#include <cstring>
 #include <memory>
 
 #include <boost/noncopyable.hpp>
@@ -14,17 +15,20 @@ namespace caney {
 		inline namespace v1 {
 			/* forward declarations */
 			template<typename AllocatorT = std::allocator<void>, typename CounterPolicyT = boost::thread_safe_counter>
-			class intrusive_buffer;
+			class generic_intrusive_buffer;
 
 			template<typename AllocatorT, typename CounterPolicyT = boost::thread_safe_counter>
-			inline boost::intrusive_ptr<intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer(AllocatorT const& alloc, std::size_t size);
+			inline boost::intrusive_ptr<generic_intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer(AllocatorT const& alloc, std::size_t size);
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_add_ref(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
+			inline void intrusive_ptr_add_ref(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_release(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
+			inline void intrusive_ptr_release(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
 
 			template<typename AllocatorT = std::allocator<void>, typename CounterPolicyT = boost::thread_safe_counter>
-			using intrusive_buffer_ptr = boost::intrusive_ptr<intrusive_buffer<AllocatorT, CounterPolicyT>>;
+			using generic_intrusive_buffer_ptr = boost::intrusive_ptr<generic_intrusive_buffer<AllocatorT, CounterPolicyT>>;
+
+			using intrusive_buffer = generic_intrusive_buffer<>;
+			using intrusive_buffer_ptr = generic_intrusive_buffer_ptr<>;
 
 			/* an intrusive buffer:
 			 * - keeps track how it was allocated, how big the buffer is and how many pointers there are (using boost::intrusive_ptr)
@@ -32,7 +36,7 @@ namespace caney {
 			 * - uses AllocatorT::rebind_alloc<char> for memory management
 			 */
 			template<typename AllocatorT, typename CounterPolicyT>
-			class intrusive_buffer final : private AllocatorT, private boost::noncopyable
+			class generic_intrusive_buffer final : private AllocatorT, private boost::noncopyable
 			{
 			public:
 				typedef unsigned char* iterator;
@@ -42,7 +46,7 @@ namespace caney {
 				typedef std::ptrdiff_t difference_type;
 
 				/* only public to be accessible by allocator::construct; use make_intrusive_buffer or alloc_intrusive_buffer instead */
-				explicit intrusive_buffer(AllocatorT const& alloc, std::size_t size, caney::private_tag_t)
+				explicit generic_intrusive_buffer(AllocatorT const& alloc, std::size_t size, caney::private_tag_t)
 				: AllocatorT(alloc), m_size(size) {
 				}
 
@@ -68,21 +72,21 @@ namespace caney {
 				mutable counter_t m_ref_counter{0};
 				const std::size_t m_size{0};
 
-				typedef intrusive_buffer<AllocatorT, CounterPolicyT> self_t;
+				typedef generic_intrusive_buffer<AllocatorT, CounterPolicyT> self_t;
 
 				typedef typename std::allocator_traits<AllocatorT>::template rebind_alloc<self_t> allocator_t;
 				typedef std::allocator_traits<allocator_t> allocator_traits_t;
 				typedef typename std::allocator_traits<AllocatorT>::template rebind_alloc<char> mem_allocator_t;
 				typedef std::allocator_traits<mem_allocator_t> mem_allocator_traits_t;
 
-				friend boost::intrusive_ptr<intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer<AllocatorT, CounterPolicyT>(AllocatorT const& alloc, std::size_t size);
-				friend void intrusive_ptr_add_ref<AllocatorT, CounterPolicyT>(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
-				friend void intrusive_ptr_release<AllocatorT, CounterPolicyT>(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
+				friend boost::intrusive_ptr<generic_intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer<AllocatorT, CounterPolicyT>(AllocatorT const& alloc, std::size_t size);
+				friend void intrusive_ptr_add_ref<AllocatorT, CounterPolicyT>(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
+				friend void intrusive_ptr_release<AllocatorT, CounterPolicyT>(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT;
 			};
 
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline boost::intrusive_ptr<intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer(AllocatorT const& alloc, std::size_t size) {
-				typedef intrusive_buffer<AllocatorT, CounterPolicyT> buffer_t;
+			inline boost::intrusive_ptr<generic_intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer(AllocatorT const& alloc, std::size_t size) {
+				typedef generic_intrusive_buffer<AllocatorT, CounterPolicyT> buffer_t;
 				typename buffer_t::allocator_t buffer_alloc(alloc);
 				typename buffer_t::mem_allocator_t mem_alloc(alloc);
 
@@ -97,21 +101,33 @@ namespace caney {
 				return boost::intrusive_ptr<buffer_t>(ptr);
 			}
 
+			template<typename AllocatorT, typename CounterPolicyT>
+			inline boost::intrusive_ptr<generic_intrusive_buffer<AllocatorT, CounterPolicyT>> alloc_intrusive_buffer(AllocatorT const& alloc, void const* data, std::size_t size) {
+				auto buf = alloc_intrusive_buffer<AllocatorT, CounterPolicyT>(alloc, size);
+				if (size > 0) std::memcpy(buf->data(), data, size);
+				return buf;
+			}
+
 			template<typename CounterPolicyT = boost::thread_safe_counter>
-			inline boost::intrusive_ptr<intrusive_buffer<std::allocator<void>, CounterPolicyT>> make_intrusive_buffer(std::size_t size) {
-				return alloc_intrusive_buffer(std::allocator<void>(), size);
+			inline boost::intrusive_ptr<generic_intrusive_buffer<std::allocator<void>, CounterPolicyT>> make_intrusive_buffer(std::size_t size) {
+				return alloc_intrusive_buffer<std::allocator<void>, CounterPolicyT>(std::allocator<void>(), size);
+			}
+
+			template<typename CounterPolicyT = boost::thread_safe_counter>
+			inline boost::intrusive_ptr<generic_intrusive_buffer<std::allocator<void>, CounterPolicyT>> make_intrusive_buffer(void const* data, std::size_t size) {
+				return alloc_intrusive_buffer<std::allocator<void>, CounterPolicyT>(std::allocator<void>(), data, size);
 			}
 
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_add_ref(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
+			inline void intrusive_ptr_add_ref(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
 				CounterPolicyT::increment(p->m_ref_counter);
 			}
 
 			template<typename AllocatorT, typename CounterPolicyT>
-			inline void intrusive_ptr_release(const intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
+			inline void intrusive_ptr_release(const generic_intrusive_buffer<AllocatorT, CounterPolicyT>* p) BOOST_NOEXCEPT {
 				try {
 					if (CounterPolicyT::decrement(p->m_ref_counter) == 0) {
-						typedef intrusive_buffer<AllocatorT, CounterPolicyT> buffer_t;
+						typedef generic_intrusive_buffer<AllocatorT, CounterPolicyT> buffer_t;
 						std::size_t size = p->m_size;
 						typename buffer_t::allocator_t buffer_alloc(static_cast<AllocatorT const&>(*p));
 						typename buffer_t::mem_allocator_t mem_alloc(static_cast<AllocatorT const&>(*p));

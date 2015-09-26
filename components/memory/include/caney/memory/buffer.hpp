@@ -1,11 +1,13 @@
 #pragma once
 
+#include "intrusive_buffer.hpp"
+
 #include <memory>
 #include <string>
 #include <type_traits>
 #include <vector>
 
-// #include <boost/variant/variant.hpp>
+#include <boost/variant/variant.hpp>
 
 namespace boost {
 	namespace asio {
@@ -204,8 +206,7 @@ namespace caney {
 
 			class shared_const_buf final: public const_buf {
 			public:
-				// typedef boost::variant<std::shared_ptr<void>> storage_t;
-				typedef std::shared_ptr<void> storage_t;
+				typedef boost::variant<std::shared_ptr<void>, intrusive_buffer_ptr> storage_t;
 
 				explicit shared_const_buf() = default;
 				shared_const_buf(shared_const_buf const& other)
@@ -228,7 +229,11 @@ namespace caney {
 					m_storage = std::move(storage);
 				}
 
-				static shared_const_buf copy(unsigned char const* data, std::size_t size);
+				static shared_const_buf copy(unsigned char const* data, std::size_t size) {
+					if (0 == size) return shared_const_buf();
+					return unsafe_use(make_intrusive_buffer(data, size));
+				}
+
 				static shared_const_buf copy(char const* data, std::size_t size) {
 					return copy(reinterpret_cast<unsigned char const*>(data), size);
 				}
@@ -245,6 +250,13 @@ namespace caney {
 					return shared_const_buf(std::move(storage), buffer);
 				}
 
+				static shared_const_buf unsafe_use(intrusive_buffer_ptr buffer) {
+					if (!buffer) return shared_const_buf();
+					// extract raw range before move
+					raw_const_buf raw(buffer->data(), buffer->size());
+					return shared_const_buf(std::move(buffer), raw);
+				}
+
 				storage_t storage() const { return m_storage; }
 
 			private:
@@ -253,7 +265,7 @@ namespace caney {
 				}
 
 				explicit shared_const_buf(storage_t storage, const_buf const& buffer)
-				: m_storage(storage) {
+				: m_storage(std::move(storage)) {
 					raw_set(buffer);
 				}
 
@@ -449,7 +461,16 @@ namespace caney {
 					raw_set(Storage::data(*storage), Storage::size(*storage));
 				}
 
-				static unique_buf copy(unsigned char const* data, std::size_t size);
+				static unique_buf allocate(std::size_t size) {
+					if (0 == size) return unique_buf();
+					return unique_buf(make_intrusive_buffer(size));
+				}
+
+				static unique_buf copy(unsigned char const* data, std::size_t size) {
+					if (0 == size) return unique_buf();
+					return unique_buf(make_intrusive_buffer(data, size));
+				}
+
 				static unique_buf copy(char const* data, std::size_t size) {
 					return copy(reinterpret_cast<unsigned char const*>(data), size);
 				}
@@ -473,18 +494,12 @@ namespace caney {
 				}
 
 			private:
-				template<std::size_t SIZE>
-				friend unique_buf make_unique_buffer();
-				friend unique_buf make_unique_buffer(std::size_t size);
-
-				explicit unique_buf(std::shared_ptr<void> storage, unsigned char* data, std::size_t size)
-				: mutable_buf(data, size), m_storage(storage) {
-				}
-				explicit unique_buf(std::shared_ptr<void> storage, char* data, std::size_t size)
-				: mutable_buf(data, size), m_storage(storage) {
+				explicit unique_buf(intrusive_buffer_ptr buffer)
+				: mutable_buf(buffer ? buffer->data() : nullptr, buffer ? buffer->size() : 0)
+				, m_storage(std::move(buffer)) {
 				}
 
-				std::shared_ptr<void> m_storage;
+				intrusive_buffer_ptr m_storage;
 			};
 
 			/* inline implementations */
@@ -542,15 +557,6 @@ namespace caney {
 			inline unique_buf mutable_buf::copy() const {
 				return unique_buf::copy(*this);
 			}
-
-			template<std::size_t SIZE>
-			unique_buf make_unique_buffer() {
-				struct data { unsigned char buffer[SIZE]; };
-				std::shared_ptr<data> ptr = std::make_shared<data>();
-				return unique_buf(ptr, ptr->buffer, SIZE);
-			}
-
-			unique_buf make_unique_buffer(std::size_t size);
 
 			inline raw_const_buf operator"" _cb(const char *str, std::size_t len) {
 				return raw_const_buf(str, len);

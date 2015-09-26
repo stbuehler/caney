@@ -9,8 +9,8 @@ namespace caney {
 			template<typename CounterPolicyT = boost::thread_safe_counter>
 			class intrusive_buffer_pool {
 			public:
-				typedef intrusive_buffer<allocator_pool::allocator<void>, CounterPolicyT> buffer_t;
-				typedef intrusive_buffer_ptr<allocator_pool::allocator<void>, CounterPolicyT> buffer_ptr_t;
+				typedef generic_intrusive_buffer<allocator_pool::allocator<void>, CounterPolicyT> buffer_t;
+				typedef generic_intrusive_buffer_ptr<allocator_pool::allocator<void>, CounterPolicyT> buffer_ptr_t;
 
 				explicit intrusive_buffer_pool(std::size_t n)
 				: m_pool(sizeof(buffer_t) + n) {
