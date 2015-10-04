@@ -33,6 +33,7 @@ endif()
 
 include(CaneyInternalAddComponent)
 include(CaneyImportBoost)
+include(CaneyDocumentation)
 include(CaneyInstall)
 
 # CANEY_BUILD_TESTS: whether to build unit tests
