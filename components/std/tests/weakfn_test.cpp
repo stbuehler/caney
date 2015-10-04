@@ -5,30 +5,32 @@
 
 #include <boost/smart_ptr/make_shared.hpp>
 
-void test_call_std(std::shared_ptr<int> ref, int inc) {
-	*ref += inc;
-}
-
-void test_call_boost(boost::shared_ptr<int> ref, int inc) {
-	*ref += inc;
-}
-
-class foo {
-public:
-	explicit foo(int init)
-	: m_value(init) {
+namespace {
+	void test_call_std(std::shared_ptr<int> ref, int inc) {
+		*ref += inc;
 	}
 
-	void bar1(int inc) {
-		m_value += inc;
+	void test_call_boost(boost::shared_ptr<int> ref, int inc) {
+		*ref += inc;
 	}
 
-	void bar2() const {
-		std::cout << "bar2\n";
-	}
+	class foo {
+	public:
+		explicit foo(int init)
+		: m_value(init) {
+		}
 
-	int m_value;
-};
+		void bar1(int inc) {
+			m_value += inc;
+		}
+
+		void bar2() const {
+			std::cout << "bar2\n";
+		}
+
+		int m_value;
+	};
+} // anonymous namespace
 
 void test_weakfn_std() {
 	auto l_test = [](std::shared_ptr<int> ref, int inc) { test_call_std(ref, inc); };

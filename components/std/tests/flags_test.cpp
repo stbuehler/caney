@@ -295,15 +295,15 @@ BOOST_AUTO_TEST_CASE(test_set) {
 		f = f & ~flag1::bit63;
 		BOOST_CHECK(f == FLAGS1_ARRAY(23, 42));
 
-		f.reset(flag1::bit3);
-		f.reset(flag1::bit5);
+		f.clear(flag1::bit3);
+		f.clear(flag1::bit5);
 		BOOST_CHECK(f == FLAGS1_ARRAY(23, 42));
-		f.reset(flag1::bit31);
-		f.reset(flag1::bit32);
-		f.reset(flag1::bit34);
-		f.reset(flag1::bit36);
-		f.reset(flag1::bit38);
-		f.reset(flag1::bit63);
+		f.clear(flag1::bit31);
+		f.clear(flag1::bit32);
+		f.clear(flag1::bit34);
+		f.clear(flag1::bit36);
+		f.clear(flag1::bit38);
+		f.clear(flag1::bit63);
 		BOOST_CHECK(f == FLAGS1_ARRAY(23, 42));
 
 		f[flag1::bit0] = true;
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(test_set) {
 
 	{
 		flags1 f{FLAGS1_ARRAY(23, 42)};
-		f.reset(flag1::bit0);
+		f.clear(flag1::bit0);
 		BOOST_CHECK(!(f & flag1::bit0));
 		BOOST_CHECK(f == FLAGS1_ARRAY(22, 42));
 		f[flag1::bit0] = true;
@@ -381,15 +381,15 @@ BOOST_AUTO_TEST_CASE(test_set) {
 		f = f & ~flag2::bit63;
 		BOOST_CHECK(f == FLAGS2_ARRAY(23, 42, 1));
 
-		f.reset(flag2::bit3);
-		f.reset(flag2::bit5);
+		f.clear(flag2::bit3);
+		f.clear(flag2::bit5);
 		BOOST_CHECK(f == FLAGS2_ARRAY(23, 42, 1));
-		f.reset(flag2::bit31);
-		f.reset(flag2::bit32);
-		f.reset(flag2::bit34);
-		f.reset(flag2::bit36);
-		f.reset(flag2::bit38);
-		f.reset(flag2::bit63);
+		f.clear(flag2::bit31);
+		f.clear(flag2::bit32);
+		f.clear(flag2::bit34);
+		f.clear(flag2::bit36);
+		f.clear(flag2::bit38);
+		f.clear(flag2::bit63);
 		BOOST_CHECK(f == FLAGS2_ARRAY(23, 42, 1));
 
 		f[flag2::bit0] = true;
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(test_set) {
 
 	{
 		flags2 f{FLAGS2_ARRAY(23, 42, 1)};
-		f.reset(flag2::bit0);
+		f.clear(flag2::bit0);
 		BOOST_CHECK(!(f & flag2::bit0));
 		BOOST_CHECK(f == FLAGS2_ARRAY(22, 42, 1));
 		f[flag2::bit0] = true;
@@ -428,7 +428,7 @@ BOOST_AUTO_TEST_CASE(test_set) {
 
 	{
 		flags2 f{FLAGS2_ARRAY(23, 42, 1)};
-		f.reset(flag2::bit64);
+		f.clear(flag2::bit64);
 		BOOST_CHECK(!(f & flag2::bit64));
 		BOOST_CHECK(f == FLAGS2_ARRAY(23, 42, 0));
 		f[flag2::bit64] = true;
