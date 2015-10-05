@@ -10,128 +10,132 @@
 #include <boost/test/test_case_template.hpp>
 #include <boost/mpl/list.hpp>
 
-class copied_exception : std::exception {
-};
+namespace {
 
-class nocopy {
-public:
-	nocopy() = default;
+	class copied_exception : std::exception {
+	};
 
-	nocopy(nocopy const&) {
-		throw copied_exception();
-	}
+	class nocopy {
+	public:
+		nocopy() = default;
 
-	nocopy& operator=(nocopy const&) {
-		throw copied_exception();
-	}
+		nocopy(nocopy const&) {
+			throw copied_exception();
+		}
 
-	nocopy(nocopy&& other) {
-		other.has_data = false;
-	}
+		nocopy& operator=(nocopy const&) {
+			throw copied_exception();
+		}
 
-	nocopy& operator=(nocopy&& other) {
-		has_data = other.has_data;
-		other.has_data = false;
-		return *this;
-	}
+		nocopy(nocopy&& other) {
+			other.has_data = false;
+		}
 
-	explicit operator bool() const {
-		return has_data;
-	}
+		nocopy& operator=(nocopy&& other) {
+			has_data = other.has_data;
+			other.has_data = false;
+			return *this;
+		}
 
-private:
-	bool has_data = true;
-};
+		explicit operator bool() const {
+			return has_data;
+		}
 
-class moveonly {
-public:
-	moveonly() = default;
+	private:
+		bool has_data = true;
+	};
 
-	moveonly(moveonly const&) = delete;
-	moveonly& operator=(moveonly const&) = delete;
+	class moveonly {
+	public:
+		moveonly() = default;
 
-	moveonly(moveonly&& other) {
-		other.has_data = false;
-	}
+		moveonly(moveonly const&) = delete;
+		moveonly& operator=(moveonly const&) = delete;
 
-	moveonly& operator=(moveonly&& other) {
-		has_data = other.has_data;
-		other.has_data = false;
-		return *this;
-	}
+		moveonly(moveonly&& other) {
+			other.has_data = false;
+		}
 
-	explicit operator bool() const {
-		return has_data;
-	}
+		moveonly& operator=(moveonly&& other) {
+			has_data = other.has_data;
+			other.has_data = false;
+			return *this;
+		}
 
-private:
-	bool has_data = true;
-};
+		explicit operator bool() const {
+			return has_data;
+		}
 
-template<typename Arg>
-class test_moving_arg {
-public:
-	void callback_by_value(Arg arg) {
-		++callback_counter;
-		BOOST_CHECK_MESSAGE(arg, "content delivered");
-	}
+	private:
+		bool has_data = true;
+	};
 
-	void callback_by_const_ref(Arg const& arg) {
-		++callback_counter;
-		BOOST_CHECK_MESSAGE(arg, "content delivered");
-	}
+	template<typename Arg>
+	class test_moving_arg {
+	public:
+		void callback_by_value(Arg arg) {
+			++callback_counter;
+			BOOST_CHECK_MESSAGE(arg, "content delivered");
+		}
 
-	void callback_by_rref(Arg&& arg) {
-		++callback_counter;
-		Arg local(std::move(arg));
-		BOOST_CHECK_MESSAGE(local, "content delivered");
-		BOOST_CHECK_MESSAGE(!arg, "content cleared");
-	}
+		void callback_by_const_ref(Arg const& arg) {
+			++callback_counter;
+			BOOST_CHECK_MESSAGE(arg, "content delivered");
+		}
 
-	template<typename Callback>
-	void test_direct_call(Callback&& callback) {
-		std::function<void(Arg)> bound_callback = std::bind(callback, this, std::placeholders::_1);
+		void callback_by_rref(Arg&& arg) {
+			++callback_counter;
+			Arg local(std::move(arg));
+			BOOST_CHECK_MESSAGE(local, "content delivered");
+			BOOST_CHECK_MESSAGE(!arg, "content cleared");
+		}
 
-		callback_counter = 0;
+		template<typename Callback>
+		void test_direct_call(Callback&& callback) {
+			std::function<void(Arg)> bound_callback = std::bind(callback, this, std::placeholders::_1);
 
-		BOOST_MESSAGE("callback call 1");
-		bound_callback(Arg());
-		BOOST_CHECK_EQUAL(callback_counter, 1);
-
-		BOOST_MESSAGE("callback call 2");
-		bound_callback(Arg());
-		BOOST_CHECK_EQUAL(callback_counter, 2);
-	}
-
-	template<typename Callback>
-	void test_strand_wrapped_call(Callback&& callback) {
-		boost::asio::io_service service;
-		boost::asio::strand strand(service);
-		std::function<void(Arg)> bound_callback = std::bind(callback, this, std::placeholders::_1);
-		std::function<void(Arg)> wrapped_callback = caney::util::wrap_dispatch(strand, bound_callback);
-		std::function<void(caney::util::move_arg<Arg>)> wrapped_callback_movearg = strand.wrap(bound_callback);
-
-		service.post([=,&service]() {
 			callback_counter = 0;
+
 			BOOST_MESSAGE("callback call 1");
-			wrapped_callback(Arg());
+			bound_callback(Arg());
+			BOOST_CHECK_EQUAL(callback_counter, 1);
+
 			BOOST_MESSAGE("callback call 2");
-			wrapped_callback(Arg());
+			bound_callback(Arg());
 			BOOST_CHECK_EQUAL(callback_counter, 2);
-			BOOST_MESSAGE("callback call 3");
-			wrapped_callback_movearg(Arg());
-			BOOST_MESSAGE("callback call 4");
-			wrapped_callback_movearg(Arg());
-			BOOST_CHECK_EQUAL(callback_counter, 4);
-			service.stop();
-		});
+		}
 
-		service.run();
-	}
+		template<typename Callback>
+		void test_strand_wrapped_call(Callback&& callback) {
+			boost::asio::io_service service;
+			boost::asio::strand strand(service);
+			std::function<void(Arg)> bound_callback = std::bind(callback, this, std::placeholders::_1);
+			std::function<void(Arg)> wrapped_callback = caney::util::wrap_dispatch(strand, bound_callback);
+			std::function<void(caney::util::move_arg<Arg>)> wrapped_callback_movearg = strand.wrap(bound_callback);
 
-private:
-	std::size_t callback_counter = 0;
-};
+			service.post([=,&service]() {
+				callback_counter = 0;
+				BOOST_MESSAGE("callback call 1");
+				wrapped_callback(Arg());
+				BOOST_MESSAGE("callback call 2");
+				wrapped_callback(Arg());
+				BOOST_CHECK_EQUAL(callback_counter, 2);
+				BOOST_MESSAGE("callback call 3");
+				wrapped_callback_movearg(Arg());
+				BOOST_MESSAGE("callback call 4");
+				wrapped_callback_movearg(Arg());
+				BOOST_CHECK_EQUAL(callback_counter, 4);
+				service.stop();
+			});
+
+			service.run();
+		}
+
+	private:
+		std::size_t callback_counter = 0;
+	};
+
+} // anonymous namespace
 
 BOOST_AUTO_TEST_SUITE(move_arg)
 
