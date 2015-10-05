@@ -1,5 +1,5 @@
+#include "caney/std/smart_ptr_traits_boost.hpp"
 #include "caney/std/weak_fn.hpp"
-#include "caney/std/weak_fn_boost.hpp"
 
 #include <iostream>
 

@@ -3,21 +3,17 @@
 #pragma once
 
 #include "internal.hpp"
-#include "weak_fn.hpp"
+#include "smart_ptr_traits.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
 __CANEY_STDV1_BEGIN
 
-/**
- * @addtogroup weak_fn
- * @{
- */
-
-namespace weakfn_traits {
+/** @namespace caney::util::v1::smart_ptr_traits */
+namespace smart_ptr_traits {
 	/**
-	 * @addtogroup weakfn_traits
+	 * @addtogroup smart_ptr_traits
 	 * @{
 	 */
 
@@ -52,8 +48,6 @@ namespace weakfn_traits {
 	};
 
 	/** @} */
-} // namespace weakfn_traits
-
-/** @} */
+} // namespace smart_ptr_traits
 
 __CANEY_STDV1_END
