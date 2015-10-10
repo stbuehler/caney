@@ -16,9 +16,9 @@ template<typename CounterPolicyT = boost::thread_safe_counter>
 class intrusive_buffer_pool {
 public:
 	/** intrusive buffer type */
-	typedef generic_intrusive_buffer<allocator_pool::allocator<void>, CounterPolicyT> buffer_t;
+	using buffer_t = generic_intrusive_buffer<CounterPolicyT, allocator_pool::allocator<void>>;
 	/** intrusive pointer to buffer */
-	typedef generic_intrusive_buffer_ptr<allocator_pool::allocator<void>, CounterPolicyT> buffer_ptr_t;
+	using buffer_ptr_t = generic_intrusive_buffer_ptr<CounterPolicyT, allocator_pool::allocator<void>>;
 
 	/**
 	 * @brief initialize pool
@@ -40,7 +40,7 @@ public:
 	 * @return allocated buffer
 	 */
 	buffer_ptr_t allocate() {
-		return alloc_intrusive_buffer(m_pool.alloc(), size());
+		return buffer_t::allocate(m_pool.alloc(), size());
 	}
 
 private:

@@ -140,6 +140,14 @@ private:
 	friend
 	struct impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>;
 
+protected:
+	/**
+	 * @brief allocator used to allocate this object. not valid during construction.
+	 */
+	Allocator const& allocator() const {
+		return m_allocator.allocator();
+	}
+
 public:
 	/**
 	 * @brief how many pointers reference the object

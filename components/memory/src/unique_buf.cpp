@@ -18,13 +18,13 @@ unique_buf& unique_buf::operator=(unique_buf const& other) {
 /* static */
 unique_buf unique_buf::allocate(std::size_t size) {
 	if (0 == size) return unique_buf();
-	return unique_buf(make_intrusive_buffer(size));
+	return unique_buf(intrusive_buffer::create(size));
 }
 
 /* static */
 unique_buf unique_buf::copy(unsigned char const* data, std::size_t size) {
 	if (0 == size) return unique_buf();
-	return unique_buf(make_intrusive_buffer(data, size));
+	return unique_buf(intrusive_buffer::create(data, size));
 }
 
 /* static */

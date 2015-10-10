@@ -7,7 +7,7 @@
 BOOST_AUTO_TEST_SUITE(intrusive_buffer_test)
 
 BOOST_AUTO_TEST_CASE(constructing) {
-	caney::memory::intrusive_buffer_ptr buf = caney::memory::make_intrusive_buffer(1024);
+	caney::memory::intrusive_buffer_ptr buf = caney::memory::intrusive_buffer::create(1024);
 	unsigned char x = 15;
 	for (auto& c: *buf) {
 		c = x++;

@@ -16,7 +16,7 @@ shared_const_buf& shared_const_buf::operator=(shared_const_buf const& other) {
 /* static */
 shared_const_buf shared_const_buf::copy(unsigned char const* data, std::size_t size) {
 	if (0 == size) return shared_const_buf();
-	return unsafe_use(make_intrusive_buffer(data, size));
+	return unsafe_use(intrusive_buffer::create(data, size));
 }
 
 /* static */
