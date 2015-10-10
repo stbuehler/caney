@@ -4,7 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(intrusive_buffer)
+BOOST_AUTO_TEST_SUITE(intrusive_buffer_test)
 
 BOOST_AUTO_TEST_CASE(constructing) {
 	caney::memory::intrusive_buffer_ptr buf = caney::memory::make_intrusive_buffer(1024);
