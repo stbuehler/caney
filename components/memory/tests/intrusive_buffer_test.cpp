@@ -7,18 +7,25 @@
 BOOST_AUTO_TEST_SUITE(intrusive_buffer)
 
 BOOST_AUTO_TEST_CASE(constructing) {
-	{
-		caney::memory::intrusive_buffer_ptr buf = caney::memory::make_intrusive_buffer(1024);
-		unsigned char x = 15;
-		for (auto& c: *buf) {
-			c = x++;
-		}
-		auto constSharedBuf = caney::memory::shared_const_buf::unsafe_use(buf);
+	caney::memory::intrusive_buffer_ptr buf = caney::memory::make_intrusive_buffer(1024);
+	unsigned char x = 15;
+	for (auto& c: *buf) {
+		c = x++;
 	}
+	auto constSharedBuf = caney::memory::shared_const_buf::unsafe_use(buf);
+}
 
+BOOST_AUTO_TEST_CASE(buffer_pool_reuse) {
+	caney::memory::intrusive_buffer_pool<> pool(512);
+	unsigned char *mem;
 	{
-		caney::memory::intrusive_buffer_pool<> pool(512);
 		auto buf = pool.allocate();
+		mem = buf->data();
+	}
+	{
+		auto buf = pool.allocate();
+		// require allocated and freed buffer is reused
+		BOOST_CHECK_EQUAL(buf->data(), mem);
 	}
 }
 

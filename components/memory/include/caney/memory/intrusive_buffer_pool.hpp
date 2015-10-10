@@ -1,33 +1,50 @@
+/** @file */
+
 #pragma once
 
 #include "allocator_pool.hpp"
+#include "internal.hpp"
 #include "intrusive_buffer.hpp"
 
-namespace caney {
-	namespace memory {
-		inline namespace v1 {
-			template<typename CounterPolicyT = boost::thread_safe_counter>
-			class intrusive_buffer_pool {
-			public:
-				typedef generic_intrusive_buffer<allocator_pool::allocator<void>, CounterPolicyT> buffer_t;
-				typedef generic_intrusive_buffer_ptr<allocator_pool::allocator<void>, CounterPolicyT> buffer_ptr_t;
+__CANEY_MEMORYV1_BEGIN
 
-				explicit intrusive_buffer_pool(std::size_t n)
-				: m_pool(sizeof(buffer_t) + n) {
-				}
+/**
+ * @brief pool for @ref generic_intrusive_buffer instances
+ * @tparam CounterPolicyT counter policy to use for @ref generic_intrusive_buffer
+ */
+template<typename CounterPolicyT = boost::thread_safe_counter>
+class intrusive_buffer_pool {
+public:
+	/** intrusive buffer type */
+	typedef generic_intrusive_buffer<allocator_pool::allocator<void>, CounterPolicyT> buffer_t;
+	/** intrusive pointer to buffer */
+	typedef generic_intrusive_buffer_ptr<allocator_pool::allocator<void>, CounterPolicyT> buffer_ptr_t;
 
-				std::size_t size() const {
-					return m_pool.size() - sizeof(buffer_t);
-				}
+	/**
+	 * @brief initialize pool
+	 * @param size size of buffers the pool will allocate
+	 */
+	explicit intrusive_buffer_pool(std::size_t size)
+	: m_pool(sizeof(buffer_t) + size) {
+	}
 
-				buffer_ptr_t allocate() {
-					return alloc_intrusive_buffer(m_pool.alloc(), size());
-				}
+	/**
+	 * @brief size of buffers this pool will allocate
+	 */
+	std::size_t size() const {
+		return m_pool.size() - sizeof(buffer_t);
+	}
 
-			private:
-				allocator_pool m_pool;
-			};
+	/**
+	 * @brief allocate a buffer (or take one from the pool if available)
+	 * @return allocated buffer
+	 */
+	buffer_ptr_t allocate() {
+		return alloc_intrusive_buffer(m_pool.alloc(), size());
+	}
 
-		}
-	} // namespace memory
-} // namespace caney
+private:
+	allocator_pool m_pool;
+};
+
+__CANEY_MEMORYV1_END

@@ -1,67 +1,65 @@
 #include "caney/memory/allocator_pool.hpp"
 
-namespace caney {
-	namespace memory {
-		inline namespace v1 {
-			namespace {
-				void mem_free(char *obj, std::size_t n) {
-					std::allocator<char>().deallocate(obj, n);
-				}
+__CANEY_MEMORYV1_BEGIN
 
-				char* mem_alloc(std::size_t n) {
-					return std::allocator<char>().allocate(n);
-				}
-			}
+namespace {
+	void mem_free(char *obj, std::size_t n) {
+		std::allocator<char>().deallocate(obj, n);
+	}
 
-			allocator_pool::pool::~pool() {
-				auto front = m_front.synchronize();
-				while (nullptr != *front) {
-					chunk_link *elem = *front;
-					*front = elem->next;
-					mem_free(reinterpret_cast<char*>(elem), m_size);
-				}
-			}
+	char* mem_alloc(std::size_t n) {
+		return std::allocator<char>().allocate(n);
+	}
+}
 
-			// static
-			char* allocator_pool::pool::allocate(pool *p, std::size_t n) {
-				n = std::max(n, sizeof(chunk_link));
+allocator_pool::pool::~pool() {
+	auto front = m_front.synchronize();
+	while (nullptr != *front) {
+		chunk_link *elem = *front;
+		*front = elem->next;
+		mem_free(reinterpret_cast<char*>(elem), m_size);
+	}
+}
 
-				if (nullptr != p && p->m_size == n) {
-					auto front = p->m_front.synchronize();
-					if (nullptr != *front) {
-						chunk_link *elem = *front;
-						*front = elem->next;
-						return reinterpret_cast<char*>(elem);
-					}
-				}
-				return mem_alloc(n);
-			}
+// static
+char* allocator_pool::pool::allocate(pool *p, std::size_t n) {
+	n = std::max(n, sizeof(chunk_link));
 
-			// static
-			void allocator_pool::pool::deallocate(pool *p, char *obj, std::size_t n) {
-				n = std::max(n, sizeof(chunk_link));
-
-				if (nullptr != p && p->m_size == n) {
-					chunk_link *elem = reinterpret_cast<chunk_link*>(obj);
-					auto front = p->m_front.synchronize();
-					elem->next = *front;
-					*front = elem;
-				} else {
-					mem_free(obj, n);
-				}
-			}
-
-			allocator_pool::allocator_pool(std::size_t size) {
-				m_pool = std::make_shared<pool>(size);
-			}
-
-			std::size_t allocator_pool::size() const {
-				return m_pool->size();
-			}
-
-			allocator_pool::allocator<void> allocator_pool::alloc() const {
-				return allocator<void>(allocator_base(m_pool));
-			}
+	if (nullptr != p && p->m_size == n) {
+		auto front = p->m_front.synchronize();
+		if (nullptr != *front) {
+			chunk_link *elem = *front;
+			*front = elem->next;
+			return reinterpret_cast<char*>(elem);
 		}
-	} // namespace memory
-} // namespace caney
+	}
+	return mem_alloc(n);
+}
+
+// static
+void allocator_pool::pool::deallocate(pool *p, char *obj, std::size_t n) {
+	n = std::max(n, sizeof(chunk_link));
+
+	if (nullptr != p && p->m_size == n) {
+		chunk_link *elem = reinterpret_cast<chunk_link*>(obj);
+		auto front = p->m_front.synchronize();
+		elem->next = *front;
+		*front = elem;
+	} else {
+		mem_free(obj, n);
+	}
+}
+
+allocator_pool::allocator_pool(std::size_t size) {
+	m_pool = std::make_shared<pool>(size);
+}
+
+std::size_t allocator_pool::size() const {
+	return m_pool->size();
+}
+
+allocator_pool::allocator<void> allocator_pool::alloc() const {
+	return allocator<void>(allocator_base(m_pool));
+}
+
+__CANEY_MEMORYV1_END
