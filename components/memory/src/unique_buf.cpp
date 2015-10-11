@@ -4,14 +4,15 @@
 
 __CANEY_MEMORYV1_BEGIN
 
-unique_buf::unique_buf(unique_buf const& other)
-: mutable_buf(), m_storage(other.m_storage) {
-	raw_set(other);
+unique_buf::unique_buf(unique_buf&& other)
+: mutable_buf(other), m_storage(std::move(other.m_storage)) {
+	other.raw_reset();
 }
 
-unique_buf& unique_buf::operator=(unique_buf const& other) {
-	m_storage = other.m_storage;
-	raw_set(other);
+unique_buf& unique_buf::operator=(unique_buf&& other) {
+	mutable_buf::operator=(other);
+	m_storage = std::move(other.m_storage);
+	other.raw_reset();
 	return *this;
 }
 
@@ -39,7 +40,7 @@ unique_buf unique_buf::copy(const_buf const& buffer) {
 
 shared_const_buf unique_buf::freeze(std::size_t size) {
 	shared_const_buf result = shared_const_buf::unsafe_use(m_storage, raw_slice(0, size));
-	raw_set(raw_slice(size));
+	mutable_buf::operator=(raw_slice(size));
 	return result;
 }
 
@@ -50,9 +51,9 @@ shared_const_buf unique_buf::freeze() {
 	return result;
 }
 
-unique_buf unique_buf::slice(size_t from, size_t length)&& {
+unique_buf unique_buf::slice(size_t from, size_t size)&& {
 	unique_buf result{std::move(*this)};
-	result.raw_set(result.raw_slice(from, length));
+	mutable_buf::operator=(result.raw_slice(from, size));
 	return result;
 }
 

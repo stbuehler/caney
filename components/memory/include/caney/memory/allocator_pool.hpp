@@ -52,7 +52,9 @@ private:
 		}
 		~pool();
 
+		/** @brief allocate object from (possible nullptr) pool */
 		static char* allocate(pool* p, std::size_t n);
+		/** @brief deallocate object in (possible nullptr) pool */
 		static void deallocate(pool *p, char* obj, std::size_t n);
 
 		std::size_t size() const { return m_size; }

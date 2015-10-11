@@ -9,18 +9,18 @@ __CANEY_MEMORYV1_BEGIN
 
 /* const_buf */
 
-shared_const_buf const_buf::shared_slice(size_type from, size_type size) const {
+shared_const_buf const_buf::shared_copy() const {
+	return shared_slice(0, m_size);
+}
+
+shared_const_buf const_buf::shared_slice(size_t from, size_t size) const {
 	from = std::min(from, m_size);
 	size = std::min(m_size - from, size);
 	return internal_shared_slice(from, size);
 }
 
-shared_const_buf const_buf::shared_slice(size_type from) const {
+shared_const_buf const_buf::shared_slice(size_t from) const {
 	return shared_slice(from, m_size);
-}
-
-shared_const_buf const_buf::shared_copy() const {
-	return shared_slice(0, m_size);
 }
 
 unique_buf const_buf::copy() const {
