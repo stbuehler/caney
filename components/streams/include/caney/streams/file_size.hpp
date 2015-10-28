@@ -2,18 +2,21 @@
 
 #include "caney/std/safe_int.hpp"
 
-namespace caney {
-	namespace streams {
-		inline namespace v1 {
-			namespace impl {
-				struct file_size_tag;
-			} // namespace impl
-		}
-	} // namespace streams
+#include "internal.hpp"
 
-	extern template class safe_int<uint64_t, streams::impl::file_size_tag>;
+__CANEY_STREAMSV1_BEGIN
 
-	namespace streams {
-		inline namespace v1 { using file_size = caney::safe_int<uint64_t, streams::impl::file_size_tag>; }
-	} // namespace streams
-} // namespace caney
+namespace impl {
+	struct file_size_tag;
+} // namespace impl
+
+__CANEY_STREAMSV1_END
+
+extern template class caney::safe_int<uint64_t, caney::streams::impl::file_size_tag>;
+
+__CANEY_STREAMSV1_BEGIN
+
+/** @brief dedicated file size type */
+using file_size = caney::safe_int<uint64_t, streams::impl::file_size_tag>;
+
+__CANEY_STREAMSV1_END

@@ -4,33 +4,34 @@
 #include <cstring>
 #include <mutex>
 
-namespace caney {
-	namespace streams {
-		inline namespace v1 {
-			namespace {
-				thread_local sigbus_handler t_sigbus_handler;
+__CANEY_STREAMSV1_BEGIN
 
-				void sigbus_func(int /* signal */) {
-					if (!t_sigbus_handler) std::abort();
-					std::longjmp(t_sigbus_handler.get_jmp_buf(), t_sigbus_handler.get_result());
-				}
+namespace {
+	thread_local impl::sigbus_handler_thread_state t_sigbus_handler_state;
 
-				void register_sigbus() {
-					static std::once_flag register_sigbus;
+	void sigbus_func(int /* signal */) {
+		if (!t_sigbus_handler_state.m_active) std::abort();
+		std::longjmp(t_sigbus_handler_state.m_sigbus_jmp_buf, t_sigbus_handler_state.m_result);
+	}
 
-					std::call_once(register_sigbus, []() { std::signal(SIGBUS, &sigbus_func); });
-				}
-			} // anonymous namespace
+	void register_sigbus() {
+		static std::once_flag register_sigbus;
 
-			sigbus_handler_ptr make_sigbus_handler() {
-				register_sigbus();
-				return sigbus_handler_ptr(&t_sigbus_handler);
-			}
+		std::call_once(register_sigbus, []() { std::signal(SIGBUS, &sigbus_func); });
+	}
+} // anonymous namespace
 
-			void sigbus_handler_disabler::operator()(sigbus_handler* handler) {
-				handler->disable();
-				memset(handler->get_jmp_buf(), 0, sizeof(std::jmp_buf));
-			}
-		}
-	} // namespace streams
-} // namespace caney
+sigbus_handler::sigbus_handler() : m_state(t_sigbus_handler_state) {
+	// make sure this is the only instance in this thread:
+	if (m_state.m_in_use) std::abort();
+	m_state.m_in_use = true;
+	register_sigbus();
+}
+
+sigbus_handler::~sigbus_handler() {
+	disable();
+	memset(&m_state.m_sigbus_jmp_buf, 0, sizeof(m_state.m_sigbus_jmp_buf));
+	m_state.m_in_use = false;
+}
+
+__CANEY_STREAMSV1_END
