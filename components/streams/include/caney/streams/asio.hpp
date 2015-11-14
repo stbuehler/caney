@@ -1,6 +1,6 @@
 #pragma once
 
-#include "caney/std/private.hpp"
+#include "caney/std/tags.hpp"
 
 #include "chunks.hpp"
 #include "streams.hpp"
@@ -130,7 +130,7 @@ namespace caney {
 
 					std::vector<boost::asio::const_buffer> data;
 					for (chunk const& c: m_write_queue.queue()) {
-						boost::optional<boost::asio::const_buffer> c_buffer = c.get_const_buffer();
+						caney::optional<boost::asio::const_buffer> c_buffer = c.get_const_buffer();
 						if (c_buffer) {
 							data.emplace_back(c_buffer.get());
 						} else {

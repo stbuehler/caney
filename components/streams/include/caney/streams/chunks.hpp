@@ -42,9 +42,9 @@ namespace caney {
 				chunk split(file_size bytes);
 				void remove(file_size bytes);
 
-				// not all chunk types support this method and will return boost::none
+				// not all chunk types support this method and will return caney::nullopt
 				// if the method is supported it must always return a (possibly empty) const_buffer
-				boost::optional<boost::asio::const_buffer> get_const_buffer() const;
+				caney::optional<boost::asio::const_buffer> get_const_buffer() const;
 
 				value_t const& get() const {
 					return m_value;

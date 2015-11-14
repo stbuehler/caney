@@ -1,12 +1,11 @@
 #pragma once
 
 #include "caney/memory/buffer.hpp"
+#include "caney/std/optional.hpp"
 
 #include "file_size.hpp"
 
 #include <system_error>
-
-#include <boost/optional.hpp>
 
 namespace caney {
 	namespace streams {
@@ -28,8 +27,8 @@ namespace caney {
 				void remove(file_size bytes);
 
 				// direct buffer access is not available
-				boost::none_t get_const_buffer() const {
-					return boost::none;
+				caney::nullopt_t get_const_buffer() const {
+					return caney::nullopt;
 				}
 
 				file_size get_offset() const {

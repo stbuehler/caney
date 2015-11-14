@@ -23,15 +23,27 @@ __CANEY_STDV1_BEGIN
  *     };
  * @endcode
  */
-class private_tag_t {
-private:
-	friend private_tag_t make_private_tag();
-	private_tag_t() = default;
+struct private_tag_t {
+	//! @cond INTERNAL
+	enum class tag_t { tag };
+	explicit constexpr private_tag_t(tag_t) { };
+	//! @endcond
 };
 
 /**
  * @brief @ref private_tag_t instance to call constructors with
  */
-extern private_tag_t private_tag;
+constexpr private_tag_t private_tag{private_tag_t::tag_t::tag};
+
+/**
+ * @brief tag type to signal constructing some internal element from following arguments
+ */
+struct in_place_t {
+};
+
+/**
+ * @brief @ref in_place_t instance
+ */
+constexpr in_place_t in_place{};
 
 __CANEY_STDV1_END

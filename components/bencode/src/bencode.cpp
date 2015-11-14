@@ -8,30 +8,30 @@ namespace caney {
 	namespace bencode {
 		inline namespace v1 {
 			namespace {
-				boost::optional<big_number> parse_bignum(memory::shared_const_buf& buf, size_t const start, unsigned char const delim) {
+				caney::optional<big_number> parse_bignum(memory::shared_const_buf& buf, size_t const start, unsigned char const delim) {
 					// need at least one digit + delim from start
-					if (buf.size() < start + 2) return boost::none;
+					if (buf.size() < start + 2) return caney::nullopt;
 					size_t i = start;
-					if (delim == buf[i]) return boost::none;
+					if (delim == buf[i]) return caney::nullopt;
 					if ('-' == buf[i]) {
 						++i;
 						// negative numbers are at least 3 characters ('-1' + delim);
 						// no leading zeroes; '-' never can be followed by a zero
-						if (buf.size() < start + 3 || '0' == buf[i]) return boost::none;
+						if (buf.size() < start + 3 || '0' == buf[i]) return caney::nullopt;
 					} else if ('0' == buf[i] && delim != buf[i+1]) {
 						// no leading zeroes allowed; exception '0' followed by the delimiter
-						return boost::none;
+						return caney::nullopt;
 					}
 					for (; i < buf.size(); ++i) {
 						if (delim == buf[i]) {
 							std::cerr << "integer is at slice(" << start << ", " << (i-1) << ") of '" << buf.data() << "' (length " << buf.size() << ")\n";
-							boost::optional<big_number> result{big_number{buf.shared_slice(start, i - 1)}};
+							caney::optional<big_number> result{big_number{buf.shared_slice(start, i - 1)}};
 							buf = buf.shared_slice(i + 1);
 							return result;
 						}
-						if (buf[i] < '0' || buf[i] > '9') return boost::none;
+						if (buf[i] < '0' || buf[i] > '9') return caney::nullopt;
 					}
-					return boost::none;
+					return caney::nullopt;
 				}
 			} // anonymous namespace
 
@@ -61,50 +61,50 @@ namespace caney {
 				}
 			}
 
-			boost::optional<big_number> parse_integral(memory::shared_const_buf& buf) {
-				if (buf.empty() || 'i' != buf[size_t{0}]) return boost::none;
+			caney::optional<big_number> parse_integral(memory::shared_const_buf& buf) {
+				if (buf.empty() || 'i' != buf[size_t{0}]) return caney::nullopt;
 				return parse_bignum(buf, 1, 'e');
 			}
 
-			boost::optional<memory::shared_const_buf> parse_string(memory::shared_const_buf& buf) {
+			caney::optional<memory::shared_const_buf> parse_string(memory::shared_const_buf& buf) {
 				memory::shared_const_buf bufCopy{buf};
-				boost::optional<big_number> const string_length_big = parse_bignum(bufCopy, 0, ':');
-				if (string_length_big.is_initialized()) return boost::none;
-				boost::optional<std::size_t> const string_length = util::parse_integral<std::size_t>(string_length_big->raw().raw_copy());
-				if (string_length.is_initialized()) return boost::none;
-				if (*string_length > bufCopy.size()) return boost::none;
+				caney::optional<big_number> const string_length_big = parse_bignum(bufCopy, 0, ':');
+				if (string_length_big) return caney::nullopt;
+				caney::optional<std::size_t> const string_length = util::parse_integral<std::size_t>(string_length_big->raw().raw_copy());
+				if (string_length) return caney::nullopt;
+				if (*string_length > bufCopy.size()) return caney::nullopt;
 				buf = bufCopy.shared_slice(*string_length);
 				return bufCopy.shared_slice(0, *string_length);
 			}
 
-			boost::optional<memory::shared_const_buf> parse_item(memory::shared_const_buf& buf) {
+			caney::optional<memory::shared_const_buf> parse_item(memory::shared_const_buf& buf) {
 				memory::shared_const_buf bufCopy{buf};
 				switch (peek_token(bufCopy)) {
 				case token::Error:
-					return boost::none;
+					return caney::nullopt;
 				case token::Integral:
-					if (!parse_integral(bufCopy).is_initialized()) return boost::none;
+					if (!parse_integral(bufCopy)) return caney::nullopt;
 					break;
 				case token::String:
-					if (!parse_string(bufCopy).is_initialized()) return boost::none;
+					if (!parse_string(bufCopy)) return caney::nullopt;
 					break;
 				case token::List:
 					bufCopy = bufCopy.shared_slice(1);
 					while (token::ContainerEnd != peek_token(bufCopy)) {
-						if (!parse_item(bufCopy).is_initialized()) return boost::none;
+						if (!parse_item(bufCopy)) return caney::nullopt;
 					}
 					bufCopy = bufCopy.shared_slice(1);
 					break;
 				case token::Dict:
 					bufCopy = bufCopy.shared_slice(1);
 					while (token::ContainerEnd != peek_token(bufCopy)) {
-						if (!parse_string(bufCopy).is_initialized()) return boost::none;
-						if (!parse_item(bufCopy).is_initialized()) return boost::none;
+						if (!parse_string(bufCopy)) return caney::nullopt;
+						if (!parse_item(bufCopy)) return caney::nullopt;
 					}
 					bufCopy = bufCopy.shared_slice(1);
 					break;
 				case token::ContainerEnd:
-					return boost::none;
+					return caney::nullopt;
 				}
 				std::size_t const item_length = buf.size() - bufCopy.size();
 				return buf.shared_slice(0, item_length);

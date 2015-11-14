@@ -2,9 +2,8 @@
 
 #include <memory>
 
-#include <boost/optional.hpp>
-
 #include "caney/std/object.hpp"
+#include "caney/std/optional.hpp"
 
 #include "origin.hpp"
 #include "generic_chunks.hpp"
@@ -152,7 +151,7 @@ namespace caney {
 						m_sink->on_receive(std::move(chunks));
 					} else {
 						m_out_pending = true;
-						if (m_out_end.is_initialized()) std::terminate();
+						if (m_out_end) std::terminate();
 						chunk_traits_t<Chunk>::append(m_out_queue, std::move(chunks));
 					}
 				}
@@ -168,7 +167,7 @@ namespace caney {
 					} else {
 						m_out_pending = true;
 						/* ignore if we already have an end */
-						if (!m_out_end.is_initialized()) m_out_end = std::move(end);
+						if (!m_out_end) m_out_end = std::move(end);
 					}
 				}
 
@@ -178,7 +177,7 @@ namespace caney {
 				// connect() will try to send pending data, and resets the flag.
 				bool m_out_pending = false;
 				chunks_t m_out_queue;
-				boost::optional<end_t> m_out_end;
+				caney::optional<end_t> m_out_end;
 
 			private:
 				template<typename FChunk>
@@ -195,16 +194,16 @@ namespace caney {
 						while (!sink->is_paused() && !chunk_traits_t<Chunk>::empty(m_out_queue)) {
 							chunks_t chunks = std::move(m_out_queue);
 							chunk_traits_t<Chunk>::clear(m_out_queue);
-							m_out_pending = m_out_end.is_initialized();
+							m_out_pending = bool(m_out_end);
 
 							// can_send() might still return false, send directly
 							sink->on_receive(std::move(chunks));
 							if (sink != m_sink) return;
 						}
 
-						if (!sink->is_paused() && m_out_end.is_initialized()) {
-							end_t end = std::move(m_out_end.get());
-							m_out_end = boost::none;
+						if (!sink->is_paused() && m_out_end) {
+							end_t end = std::move(m_out_end.value());
+							m_out_end = caney::nullopt;
 
 							m_out_pending = false;
 							send_end(std::move(end));

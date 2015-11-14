@@ -50,9 +50,9 @@ namespace caney {
 					}
 				};
 
-				struct chunk_get_const_buffer : public boost::static_visitor<boost::optional<boost::asio::const_buffer>> {
+				struct chunk_get_const_buffer : public boost::static_visitor<caney::optional<boost::asio::const_buffer>> {
 					template<typename T>
-					boost::optional<boost::asio::const_buffer> operator()(T& content) const {
+					caney::optional<boost::asio::const_buffer> operator()(T& content) const {
 						return content.get_const_buffer();
 					}
 				};
@@ -76,7 +76,7 @@ namespace caney {
 				boost::apply_visitor(chunk_remove_visitor(bytes), m_value);
 			}
 
-			boost::optional<boost::asio::const_buffer> chunk::get_const_buffer() const {
+			caney::optional<boost::asio::const_buffer> chunk::get_const_buffer() const {
 				return boost::apply_visitor(chunk_get_const_buffer(), m_value);
 			}
 
