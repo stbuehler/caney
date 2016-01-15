@@ -3,8 +3,8 @@
 #include "internal.hpp"
 
 #include <cassert>
-#include <memory>
 #include <csetjmp>
+#include <memory>
 
 #include <boost/noncopyable.hpp>
 

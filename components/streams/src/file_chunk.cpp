@@ -2,8 +2,7 @@
 
 __CANEY_STREAMSV1_BEGIN
 
-file_chunk::file_chunk(std::shared_ptr<file_handle> handle, file_size offset, file_size length)
-: m_handle(handle), m_offset(offset), m_length(length) {}
+file_chunk::file_chunk(std::shared_ptr<file_handle> handle, file_size offset, file_size length) : m_handle(handle), m_offset(offset), m_length(length) {}
 
 file_chunk file_chunk::split(file_size bytes) {
 	if (bytes > m_length) std::terminate();
