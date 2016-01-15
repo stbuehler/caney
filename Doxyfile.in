@@ -2,6 +2,9 @@ PROJECT_NAME           = "caney"
 PROJECT_NUMBER         = "@caney_VERSION@"
 PROJECT_BRIEF          = "Collection of useful C++ classes based on boost and C++14."
 
+ALIASES += nowarn="\{"
+ALIASES += endnowarn="\}"
+
 # The STRIP_FROM_PATH tag can be used to strip a user-defined part of the path.
 # Stripping is only done if one of the specified strings matches the left-hand
 # part of the path. The tag can be used to show relative paths in the file list.
@@ -573,7 +576,7 @@ EXCLUDE_SYMLINKS       = YES
 # Note that the wildcards are matched against the file with absolute path, so to
 # exclude all test directories for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       =
+EXCLUDE_PATTERNS       = */tests/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
