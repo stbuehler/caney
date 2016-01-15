@@ -109,7 +109,7 @@ namespace impl {
 
 	template <typename Enum>
 	struct is_scoped_enum<Enum, true> : std::integral_constant<bool, !std::is_convertible<Enum, std::underlying_type_t<Enum>>::value> {};
-}
+} // namespace impl
 
 /**
  * @brief bitset representing possible set flags from enum

@@ -80,7 +80,7 @@ namespace impl {
 	private:
 		const size_type m_extent{0};
 	};
-}
+} // namespace impl
 
 
 /* forward declarations */

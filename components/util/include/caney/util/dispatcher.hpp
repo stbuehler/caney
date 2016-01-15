@@ -80,7 +80,7 @@ namespace impl {
 		typedef std::decay_t<Dispatcher> DispatcherT;
 		DispatcherT m_dispatcher;
 	};
-}
+} // namespace impl
 
 /**
  * @brief return a new callable which passes all calls to `callable` through `dispatcher` using dispatch() on the dispatcher

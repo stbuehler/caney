@@ -10,7 +10,7 @@ __CANEY_STREAMSV1_BEGIN
 
 namespace impl {
 	class origin_pause_watcher;
-}
+} // namespace impl
 
 class origin;
 class origin_pause;

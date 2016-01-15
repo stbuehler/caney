@@ -119,7 +119,7 @@ namespace impl {
 	// get traits for a `Derived` type (must be derived from `intrusive_base<...>` or this fails)
 	template <typename Derived>
 	using intrusive_traits = typename intrusive_traits_detect<Derived>::type::type;
-}
+} // namespace impl
 
 /**
  * @brief similar to `boost::intrusive_ref_counter` this is a base class to derive

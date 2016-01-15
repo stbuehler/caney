@@ -15,7 +15,7 @@ namespace impl {
 
 		origin* m_origin = nullptr;
 	};
-}
+} // namespace impl
 
 origin::~origin() {
 	std::shared_ptr<impl::origin_pause_watcher> p = m_weak_pause.lock();

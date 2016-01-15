@@ -10,7 +10,7 @@ namespace {
 	char* mem_alloc(std::size_t n) {
 		return std::allocator<char>().allocate(n);
 	}
-}
+} // anonymous namespace
 
 allocator_pool::pool::~pool() {
 	auto front = m_front.synchronize();

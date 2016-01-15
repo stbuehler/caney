@@ -53,7 +53,7 @@ namespace {
 			return content.get_const_buffer();
 		}
 	};
-}
+} // anonymous namespace
 
 chunk::chunk(memory_chunk&& chunk) : m_value(std::move(chunk)) {}
 

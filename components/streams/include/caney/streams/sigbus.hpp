@@ -42,7 +42,7 @@ namespace impl {
 		volatile bool m_active = false;
 		bool m_in_use = false;
 	};
-}
+} // namespace impl
 
 /**
  * @brief class to wrap SIGBUS handling
