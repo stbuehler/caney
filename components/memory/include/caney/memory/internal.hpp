@@ -1,4 +1,5 @@
 /** @file */
+// clang-format off
 
 #pragma once
 
