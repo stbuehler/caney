@@ -23,7 +23,7 @@ __CANEY_STDV1_BEGIN
  * @tparam Value value type to store a reference to while holding the lock
  * @tparam Lock  lock type to use; requires a `Lock::mutex_type` typedef to the mutex it locks.
  */
-template<typename Value, typename Lock>
+template <typename Value, typename Lock>
 class locked_synchronized {
 public:
 	/// value type
@@ -36,9 +36,7 @@ public:
 	 * @param mutex the mutex to lock (using a lock of template argument Lock type)
 	 * @param value reference to value this object synchronizes access to
 	 */
-	explicit locked_synchronized(typename Lock::mutex_type& mutex, value_type& value)
-	: m_lock(mutex), m_value_ref(value) {
-	}
+	explicit locked_synchronized(typename Lock::mutex_type& mutex, value_type& value) : m_lock(mutex), m_value_ref(value) {}
 
 	/** @return pointer to locked value */
 	value_type* operator->() const {
@@ -67,12 +65,13 @@ private:
  * @tparam Mutex       mutex type to synchronize with
  * @tparam SharedLock  template type taking a Mutex as template argument to realize shared read-only access to the value
  * @tparam Lock        template type taking a Mutex as template argument to realize exclusive access to the value
- * @tparam AllowAssign whether assigning from other @ref generic_synchronized values is allowed; when enabled this locks implicitly on assigning and should be used with care
+ * @tparam AllowAssign whether assigning from other @ref generic_synchronized values is allowed; when enabled this locks implicitly on assigning and should be
+ * used with care
  *
  * A mutex providing shared_lock functionality comes with a significant overhead when compared to a simple exclusive-only mutex.
  * You can use an exclusive-only mutex too, and use the same (exclusive) lock for `Lock` and `SharedLock`
  */
-template<typename Value, typename Mutex, template<typename M> class SharedLock, template<typename M> class Lock, bool AllowAssign>
+template <typename Value, typename Mutex, template <typename M> class SharedLock, template <typename M> class Lock, bool AllowAssign>
 class generic_synchronized {
 public:
 	/// value type to synchronize
@@ -94,55 +93,46 @@ private:
 
 public:
 	/// default-construct contained value
-	template<typename std::enable_if<std::is_default_constructible<value_type>::value>::type* = nullptr>
-	explicit generic_synchronized()
-	: m_value() {
-	}
+	template <typename std::enable_if<std::is_default_constructible<value_type>::value>::type* = nullptr>
+	explicit generic_synchronized() : m_value() {}
 
 	/**
 	 * @brief construct contained value from parameter
 	 * @param from data to construct contained value from (types must be convertible)
 	 */
-	template<typename From, typename std::enable_if<std::is_convertible<From&&, value_type>::value>::type* = nullptr>
-	explicit generic_synchronized(From&& from)
-	: m_value(std::forward<From>(from)) {
-	}
+	template <typename From, typename std::enable_if<std::is_convertible<From&&, value_type>::value>::type* = nullptr>
+	explicit generic_synchronized(From&& from) : m_value(std::forward<From>(from)) {}
 
 	/**
 	 * @brief constuct contained value from another @ref generic_synchronized value of same type (locking it temporarily for shared access)
 	 * @param other @ref generic_synchronized value to copy value from
 	 */
-	generic_synchronized(generic_synchronized const& other)
-	: m_value(other.shared_synchronize().get()) {
-	}
+	generic_synchronized(generic_synchronized const& other) : m_value(other.shared_synchronize().get()) {}
 
 	/**
 	 * @brief move-constuct contained value from another @ref generic_synchronized value of same type (locking it temporarily for exlusive access)
 	 * @param other @ref generic_synchronized value to copy value from
 	 */
-	generic_synchronized(generic_synchronized&& other)
-	: m_value(std::move(other.synchronize().get())) {
-	}
+	generic_synchronized(generic_synchronized&& other) : m_value(std::move(other.synchronize().get())) {}
 
 	/**
 	 * @brief constuct contained value from another @ref generic_synchronized value containting a convertible value (locking it temporarily for shared access)
 	 * @param from @ref generic_synchronized value to copy value from
 	 */
-	template<typename FromT, typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
-		typename std::enable_if<std::is_convertible<FromT const&, value_type>::value>::type* = nullptr>
+	template <typename FromT, typename FromMutex, template <typename M> class FromSharedLock, template <typename M> class FromLock, bool FromAllowAssign,
+			  typename std::enable_if<std::is_convertible<FromT const&, value_type>::value>::type* = nullptr>
 	explicit generic_synchronized(generic_synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign> const& from)
-	: m_value(from.shared_synchronize().get()) {
-	}
+	: m_value(from.shared_synchronize().get()) {}
 
 	/**
-	 * @brief move-constuct contained value from another @ref generic_synchronized value containting a convertible value (locking it temporarily for exlusive access)
+	 * @brief move-constuct contained value from another @ref generic_synchronized value containting a convertible value (locking it temporarily for exlusive
+	 * access)
 	 * @param from @ref generic_synchronized value to copy value from
 	 */
-	template<typename FromT, typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
-		typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+	template <typename FromT, typename FromMutex, template <typename M> class FromSharedLock, template <typename M> class FromLock, bool FromAllowAssign,
+			  typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
 	explicit generic_synchronized(generic_synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign>&& from)
-	: m_value(std::move(from.synchronize().get())) {
-	}
+	: m_value(std::move(from.synchronize().get())) {}
 
 	/**
 	 * @brief assign contained value from another @ref generic_synchronized instance containting a convertible value (locking both temporarily)
@@ -151,9 +141,9 @@ public:
 	 * First copies new value into a temporary while holding a shared lock on the other object;
 	 * then moves into place while holding an exclusing lock on itself.
 	 */
-	template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
-		typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
-	typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+	template <typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr, typename FromMutex,
+			  template <typename M> class FromSharedLock, template <typename M> class FromLock, bool FromAllowAssign,
+			  typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
 	generic_synchronized& operator=(generic_synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign> const& other) {
 		auto tmp = other.shared_synchronize().get();
 		synchronize().get() = std::move(tmp);
@@ -167,9 +157,9 @@ public:
 	 * First copies new value into a temporary while holding a shared lock on the other object;
 	 * then moves into place while holding an exclusing lock on itself.
 	 */
-	template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
-		typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
-	typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+	template <typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr, typename FromMutex,
+			  template <typename M> class FromSharedLock, template <typename M> class FromLock, bool FromAllowAssign,
+			  typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
 	generic_synchronized& operator=(generic_synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign>& other) {
 		auto tmp = other.shared_synchronize().get();
 		synchronize().get() = std::move(tmp);
@@ -183,9 +173,9 @@ public:
 	 * First moves new value into a temporary while holding a shared lock on the other object;
 	 * then moves into place while holding an exclusing lock on itself.
 	 */
-	template<typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr,
-		typename FromMutex, template<typename M> class FromSharedLock, template<typename M> class FromLock, bool FromAllowAssign,
-	typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
+	template <typename FromT, bool TAllowAssign = AllowAssign, typename std::enable_if<TAllowAssign && AllowAssign>::type* = nullptr, typename FromMutex,
+			  template <typename M> class FromSharedLock, template <typename M> class FromLock, bool FromAllowAssign,
+			  typename std::enable_if<std::is_convertible<FromT&&, value_type>::value>::type* = nullptr>
 	generic_synchronized& operator=(generic_synchronized<FromT, FromMutex, FromSharedLock, FromLock, FromAllowAssign>&& other) {
 		auto tmp = std::move(other.synchronize().get());
 		synchronize().get() = std::move(tmp);
@@ -196,7 +186,7 @@ public:
 	 * @brief assign contained value from parameter
 	 * @param from data to assign contained value from (types must be convertible)
 	 */
-	template<typename From, typename std::enable_if<std::is_convertible<From&&, value_type>::value>::type* = nullptr>
+	template <typename From, typename std::enable_if<std::is_convertible<From&&, value_type>::value>::type* = nullptr>
 	generic_synchronized& operator=(From&& from) {
 		synchronize().get() = std::forward<From>(from);
 		return *this;
@@ -223,7 +213,7 @@ public:
 	 * @param callback callback to call with reference to value
 	 * @return whatever the callback returned
 	 */
-	template<typename Callable>
+	template <typename Callable>
 	auto synchronize(Callable&& callback) -> decltype(callback(m_value)) {
 		lock_t lock(m_mutex);
 		return callback(m_value);
@@ -234,7 +224,7 @@ public:
 	 * @param callback callback to call with reference to const value
 	 * @return whatever the callback returned
 	 */
-	template<typename Callable>
+	template <typename Callable>
 	auto shared_synchronize(Callable&& callback) const -> decltype(callback(m_value)) {
 		shared_lock_t lock(m_mutex);
 		return callback(m_value);
@@ -246,7 +236,7 @@ public:
  * @tparam Value       value type to synchronize access to
  * @tparam AllowAssign AllowAssign for @ref generic_synchronized, default to false
  */
-template<typename Value, bool AllowAssign = false>
+template <typename Value, bool AllowAssign = false>
 using synchronized = generic_synchronized<Value, std::mutex, std::unique_lock, std::unique_lock, AllowAssign>;
 
 /**
@@ -255,11 +245,11 @@ using synchronized = generic_synchronized<Value, std::mutex, std::unique_lock, s
  * @tparam AllowAssign AllowAssign for @ref generic_synchronized, default to false
  */
 #if __cplusplus >= 201402L
-	template<typename Value, bool AllowAssign = false>
-	using shared_synchronized = generic_synchronized<Value, std::shared_timed_mutex, std::shared_lock, std::unique_lock, AllowAssign>;
+template <typename Value, bool AllowAssign = false>
+using shared_synchronized = generic_synchronized<Value, std::shared_timed_mutex, std::shared_lock, std::unique_lock, AllowAssign>;
 #else
-	template<typename Value, bool AllowAssign = false>
-	using shared_synchronized = generic_synchronized<Value, boost::shared_mutex, boost::shared_lock, boost::unique_lock, AllowAssign>;
+template <typename Value, bool AllowAssign = false>
+using shared_synchronized = generic_synchronized<Value, boost::shared_mutex, boost::shared_lock, boost::unique_lock, AllowAssign>;
 #endif
 
 __CANEY_STDV1_END

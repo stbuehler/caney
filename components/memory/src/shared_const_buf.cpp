@@ -35,8 +35,6 @@ shared_const_buf shared_const_buf::internal_shared_slice(size_t from, size_t siz
 	return unsafe_use(m_storage, raw_slice(from, size));
 }
 
-shared_const_buf::shared_const_buf(storage_t storage, const_buf const& buffer)
-: const_buf(buffer), m_storage(std::move(storage)) {
-}
+shared_const_buf::shared_const_buf(storage_t storage, const_buf const& buffer) : const_buf(buffer), m_storage(std::move(storage)) {}
 
 __CANEY_MEMORYV1_END

@@ -4,10 +4,10 @@
 
 #include "internal.hpp"
 
-#include <string>
 #include <cstdint>
-#include <type_traits>
 #include <limits>
+#include <string>
+#include <type_traits>
 
 __CANEY_UTILV1_BEGIN
 
@@ -21,9 +21,8 @@ namespace impl {
  * @param val
  * @return decimal representation of signed integer (only digits + sign if negative)
  */
-template<typename Integral, std::enable_if_t<std::numeric_limits<Integral>::is_integer && std::numeric_limits<Integral>::is_signed>* = nullptr>
-std::string to_string(Integral val)
-{
+template <typename Integral, std::enable_if_t<std::numeric_limits<Integral>::is_integer && std::numeric_limits<Integral>::is_signed>* = nullptr>
+std::string to_string(Integral val) {
 	return impl::to_string(intmax_t{val});
 }
 
@@ -32,9 +31,8 @@ std::string to_string(Integral val)
  * @param val
  * @return decimal representation of unsigned integer (only digits)
  */
-template<typename Integral, std::enable_if_t<std::numeric_limits<Integral>::is_integer && !std::numeric_limits<Integral>::is_signed>* = nullptr>
-std::string to_string(Integral val)
-{
+template <typename Integral, std::enable_if_t<std::numeric_limits<Integral>::is_integer && !std::numeric_limits<Integral>::is_signed>* = nullptr>
+std::string to_string(Integral val) {
 	return impl::to_string(uintmax_t{val});
 }
 

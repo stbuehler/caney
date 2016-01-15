@@ -14,7 +14,7 @@
 __CANEY_STDV1_BEGIN
 
 namespace impl {
-	template<typename Int>
+	template <typename Int>
 	struct checked_int_ops {
 		static_assert(std::numeric_limits<Int>::is_integer, "only works for integers");
 
@@ -26,7 +26,7 @@ namespace impl {
 			return std::numeric_limits<Int>::max();
 		}
 
-		template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_add(Int const a, Int const b) {
 			using std::to_string;
 			if (a >= 0) {
@@ -39,7 +39,7 @@ namespace impl {
 			return a + b;
 		}
 
-		template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_add(Int const a, Int const b) {
 			using std::to_string;
 			/* unsigned variant: always a >= 0: */
@@ -48,7 +48,7 @@ namespace impl {
 			return a + b;
 		}
 
-		template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_sub(Int const a, Int const b) {
 			using std::to_string;
 			if (b < 0) {
@@ -59,7 +59,7 @@ namespace impl {
 			return a - b;
 		}
 
-		template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_sub(Int const a, Int const b) {
 			using std::to_string;
 			/* unsigned variant: always b >= 0: */
@@ -67,46 +67,51 @@ namespace impl {
 			return a - b;
 		}
 
-		template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_mul(Int const a, Int const b) {
 			using std::to_string;
-			if (0 == a || 0 == b) return a*b;
+			if (0 == a || 0 == b) return a * b;
 			if (a < 0) {
 				if (b > 0) {
-					if (a < min() / b) throw std::overflow_error(std::string(__func__) + ": multiplication negative overflow: " + to_string(a) + " * " + to_string(b));
+					if (a < min() / b)
+						throw std::overflow_error(std::string(__func__) + ": multiplication negative overflow: " + to_string(a) + " * " + to_string(b));
 				} else if (min() == a || min() == b) {
 					throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
 				} else /* a < 0, b < 0, (-a) and (-b) valid */ {
-					if ((-a) > max() / (-b)) throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
+					if ((-a) > max() / (-b))
+						throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
 				}
 			} else { /* a > 0 */
 				if (b < 0) {
-					if (b < min() / a) throw std::overflow_error(std::string(__func__) + ": multiplication negative overflow: " + to_string(a) + " * " + to_string(b));
+					if (b < min() / a)
+						throw std::overflow_error(std::string(__func__) + ": multiplication negative overflow: " + to_string(a) + " * " + to_string(b));
 				} else /* b > 0 */ {
-					if (a > max() / b) throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
+					if (a > max() / b)
+						throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
 				}
 			}
 			return a * b;
 		}
 
-		template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_mul(Int const a, Int const b) {
 			using std::to_string;
-			if (0 == a || 0 == b) return a*b;
+			if (0 == a || 0 == b) return a * b;
 			/* unsigned variant: always a > 0 && b > 0: */
 			if (a > max() / b) throw std::overflow_error(std::string(__func__) + ": multiplication positive overflow: " + to_string(a) + " * " + to_string(b));
 			return a * b;
 		}
 
-		template<typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_div(Int const a, Int const b) {
 			using std::to_string;
-			if (a == min() && (b < 0 && b == Int{-1})) std::overflow_error(std::string(__func__) + ": division negative overflow: " + to_string(a) + " / " + to_string(b));
+			if (a == min() && (b < 0 && b == Int{-1}))
+				std::overflow_error(std::string(__func__) + ": division negative overflow: " + to_string(a) + " / " + to_string(b));
 			if (0 == b) throw std::overflow_error(std::string(__func__) + ": division by zero: " + to_string(a) + " / " + to_string(b));
 			return a / b;
 		}
 
-		template<typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
+		template <typename X = Int, typename std::enable_if<!std::numeric_limits<X>::is_signed>::type* = nullptr>
 		static CANEY_RELAXED_CONSTEXPR Int checked_div(Int const a, Int const b) {
 			using std::to_string;
 			/* unsigned variant: always b >= 0 */
@@ -139,7 +144,7 @@ struct safe_int_default_tag;
  * @tparam UnderylingInt underlying primitive integer type to wrap
  * @tparam Tag           some type to distinguish safe_int type instances
  */
-template<typename UnderylingInt, typename Tag = safe_int_default_tag>
+template <typename UnderylingInt, typename Tag = safe_int_default_tag>
 class safe_int {
 private:
 	using ops = impl::checked_int_ops<UnderylingInt>;
@@ -151,16 +156,13 @@ public:
 	using tag_type = Tag;
 
 	/// default construct value to zero
-	explicit constexpr safe_int() noexcept {
-	}
+	explicit constexpr safe_int() noexcept {}
 
 	/**
 	 * @brief initialize with given primitive value (requires explicit construction)
 	 * @param value primitive value to initialize with
 	 */
-	explicit constexpr safe_int(value_type value) noexcept
-	: m_value(value) {
-	}
+	explicit constexpr safe_int(value_type value) noexcept : m_value(value) {}
 
 	/// @brief default copy constructor
 	constexpr safe_int(safe_int const&) noexcept = default;
@@ -203,28 +205,58 @@ public:
 	 * @{
 	 * @brief overflow checked primitive operation (throwing `std::overflow_error` on failures)
 	 */
-	friend safe_int& operator+=(safe_int& a, safe_int b) { return a = a + b; }
-	friend safe_int& operator-=(safe_int& a, safe_int b) { return a = a - b; }
-	friend safe_int& operator*=(safe_int& a, safe_int b) { return a = a * b; }
-	friend safe_int& operator/=(safe_int& a, safe_int b) { return a = a / b; }
+	friend safe_int& operator+=(safe_int& a, safe_int b) {
+		return a = a + b;
+	}
+	friend safe_int& operator-=(safe_int& a, safe_int b) {
+		return a = a - b;
+	}
+	friend safe_int& operator*=(safe_int& a, safe_int b) {
+		return a = a * b;
+	}
+	friend safe_int& operator/=(safe_int& a, safe_int b) {
+		return a = a / b;
+	}
 
-	friend constexpr safe_int operator+(safe_int a, safe_int b) { return safe_int(ops::checked_add(a.m_value, b.m_value)); }
-	friend constexpr safe_int operator-(safe_int a)             { return safe_int(ops::checked_sub(value_type{0}, a.m_value)); }
-	friend constexpr safe_int operator-(safe_int a, safe_int b) { return safe_int(ops::checked_sub(a.m_value, b.m_value)); }
-	friend constexpr safe_int operator*(safe_int a, safe_int b) { return safe_int(ops::checked_mul(a.m_value, b.m_value)); }
-	friend constexpr safe_int operator/(safe_int a, safe_int b) { return safe_int(ops::checked_div(a.m_value, b.m_value)); }
+	friend constexpr safe_int operator+(safe_int a, safe_int b) {
+		return safe_int(ops::checked_add(a.m_value, b.m_value));
+	}
+	friend constexpr safe_int operator-(safe_int a) {
+		return safe_int(ops::checked_sub(value_type{0}, a.m_value));
+	}
+	friend constexpr safe_int operator-(safe_int a, safe_int b) {
+		return safe_int(ops::checked_sub(a.m_value, b.m_value));
+	}
+	friend constexpr safe_int operator*(safe_int a, safe_int b) {
+		return safe_int(ops::checked_mul(a.m_value, b.m_value));
+	}
+	friend constexpr safe_int operator/(safe_int a, safe_int b) {
+		return safe_int(ops::checked_div(a.m_value, b.m_value));
+	}
 	/** @} */
 
 	/**
 	 * @{
 	 * @brief default comparision operator on contained primitive type
 	 */
-	friend constexpr bool operator< (safe_int a, safe_int b) { return a.m_value <  b.m_value; }
-	friend constexpr bool operator<=(safe_int a, safe_int b) { return a.m_value <= b.m_value; }
-	friend constexpr bool operator> (safe_int a, safe_int b) { return a.m_value >  b.m_value; }
-	friend constexpr bool operator>=(safe_int a, safe_int b) { return a.m_value >= b.m_value; }
-	friend constexpr bool operator==(safe_int a, safe_int b) { return a.m_value == b.m_value; }
-	friend constexpr bool operator!=(safe_int a, safe_int b) { return a.m_value != b.m_value; }
+	friend constexpr bool operator<(safe_int a, safe_int b) {
+		return a.m_value < b.m_value;
+	}
+	friend constexpr bool operator<=(safe_int a, safe_int b) {
+		return a.m_value <= b.m_value;
+	}
+	friend constexpr bool operator>(safe_int a, safe_int b) {
+		return a.m_value > b.m_value;
+	}
+	friend constexpr bool operator>=(safe_int a, safe_int b) {
+		return a.m_value >= b.m_value;
+	}
+	friend constexpr bool operator==(safe_int a, safe_int b) {
+		return a.m_value == b.m_value;
+	}
+	friend constexpr bool operator!=(safe_int a, safe_int b) {
+		return a.m_value != b.m_value;
+	}
 	/** @} */
 
 private:

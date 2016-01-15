@@ -36,23 +36,23 @@ namespace smart_ptr_traits {
 	 * @brief traits to handle a strong reference type
 	 * @tparam Ptr a strong reference to some object, for example `std::shared_ptr<uint32_t>`
 	 */
-	template<typename Ptr>
+	template <typename Ptr>
 	struct shared_ptr_traits;
 
 	/**
 	 * @brief traits to handle a weak reference type
 	 * @tparam Ptr a weak reference to some object, for example `std::weak_ptr<uint32_t>`
 	 */
-	template<typename Ptr>
+	template <typename Ptr>
 	struct weak_ptr_traits;
 
 	namespace impl {
-		template<typename Object>
+		template <typename Object>
 		struct std_ptr_traits {
-			template<typename T>
+			template <typename T>
 			using shared_ptr = std::shared_ptr<T>;
 
-			template<typename T>
+			template <typename T>
 			using weak_ptr = std::weak_ptr<T>;
 
 			using object_t = Object;
@@ -66,16 +66,14 @@ namespace smart_ptr_traits {
 	/**
 	  * @brief support `std::shared_ptr<Object>` for all `Object` types in `shared_ptr_traits`
 	  */
-	template<typename Object>
-	struct shared_ptr_traits<std::shared_ptr<Object>> : impl::std_ptr_traits<Object> {
-	};
+	template <typename Object>
+	struct shared_ptr_traits<std::shared_ptr<Object>> : impl::std_ptr_traits<Object> {};
 
 	/**
 	  * @brief support `std::weak_ptr<Object>` for all `Object` types in `weak_ptr_traits`
 	  */
-	template<typename Object>
-	struct weak_ptr_traits<std::weak_ptr<Object>> : impl::std_ptr_traits<Object> {
-	};
+	template <typename Object>
+	struct weak_ptr_traits<std::weak_ptr<Object>> : impl::std_ptr_traits<Object> {};
 	/** @} */
 } // namespace smart_ptr_traits
 

@@ -14,27 +14,23 @@ __CANEY_MEMORYV1_BEGIN
  * This is very handy in parsers when you want to pass on sliced
  * buffers.
  */
-class tmp_const_buf final: public const_buf {
+class tmp_const_buf final : public const_buf {
 public:
 	/**
-	 * @brief empty buffer, not keeping a reference to another buffer 
+	 * @brief empty buffer, not keeping a reference to another buffer
 	 */
 	explicit tmp_const_buf() = default;
 
 	/**
 	 * @brief reference full range of another buffer
 	 */
-	explicit tmp_const_buf(const_buf const& backend)
-	: const_buf(backend), m_backend(&backend) {
-	}
+	explicit tmp_const_buf(const_buf const& backend) : const_buf(backend), m_backend(&backend) {}
 
 	/**
 	 * @brief reference given `slice` of another buffer
 	 * @pre `slice` must be a slice of the `backend`
 	 */
-	explicit tmp_const_buf(const_buf const& backend, const_buf const& slice)
-	: const_buf(slice), m_backend(&backend) {
-	}
+	explicit tmp_const_buf(const_buf const& backend, const_buf const& slice) : const_buf(slice), m_backend(&backend) {}
 
 	/** @brief copy constructor */
 	tmp_const_buf(tmp_const_buf const&) = default;
@@ -42,8 +38,7 @@ public:
 	tmp_const_buf& operator=(tmp_const_buf const& other) = default;
 
 	/** @brief move constructor (cleans up original) */
-	tmp_const_buf(tmp_const_buf&& other)
-	: const_buf(other), m_backend(other.m_backend) {
+	tmp_const_buf(tmp_const_buf&& other) : const_buf(other), m_backend(other.m_backend) {
 		other.reset();
 	}
 

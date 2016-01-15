@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "mutable_buf.hpp"
 #include "intrusive_buffer.hpp"
+#include "mutable_buf.hpp"
 
 #include <memory>
 
@@ -12,7 +12,7 @@ __CANEY_MEMORYV1_BEGIN
 /**
  * @brief implementation of @ref mutable_buf which keeps memory alive.
  */
-class unique_buf final: public mutable_buf {
+class unique_buf final : public mutable_buf {
 public:
 	/** @brief construct empty buffer */
 	explicit unique_buf() = default;
@@ -37,7 +37,7 @@ public:
 	/**
 	 * move container into buffer
 	 */
-	template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
+	template <typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* = nullptr>
 	unique_buf(Container&& data) {
 		std::shared_ptr<Container> storage = std::make_shared<Container>(std::move(data));
 		m_storage = storage;
@@ -81,13 +81,13 @@ public:
 	 * @param from index to copy data from (gets ranged clipped)
 	 * @param size how many bytes to copy (gets ranged clipped)
 	 */
-	unique_buf slice(size_t from, size_t size)&&;
+	unique_buf slice(size_t from, size_t size) &&;
 
 	/**
 	 * @brief create slice from a temporary buffer, alias to
 	 *     `slice(from, size())`
 	 */
-	unique_buf slice(size_t from)&&;
+	unique_buf slice(size_t from) &&;
 
 private:
 	explicit unique_buf(intrusive_buffer_ptr buffer);

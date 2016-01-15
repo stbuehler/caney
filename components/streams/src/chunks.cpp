@@ -7,9 +7,7 @@
 namespace caney {
 	namespace streams {
 		inline namespace v1 {
-			memory_chunk::memory_chunk(memory::shared_const_buf&& buffer)
-			: m_buffer(std::move(buffer)) {
-			}
+			memory_chunk::memory_chunk(memory::shared_const_buf&& buffer) : m_buffer(std::move(buffer)) {}
 
 			file_size memory_chunk::bytes() const {
 				return file_size{m_buffer.size()};
@@ -32,9 +30,9 @@ namespace caney {
 			namespace {
 				struct chunk_split_visitor : public boost::static_visitor<chunk> {
 					file_size m_bytes;
-					chunk_split_visitor(file_size bytes) : m_bytes(bytes) { }
+					chunk_split_visitor(file_size bytes) : m_bytes(bytes) {}
 
-					template<typename T>
+					template <typename T>
 					chunk operator()(T& content) const {
 						return chunk(content.split(m_bytes));
 					}
@@ -42,27 +40,25 @@ namespace caney {
 
 				struct chunk_remove_visitor : public boost::static_visitor<void> {
 					file_size m_bytes;
-					chunk_remove_visitor(file_size bytes) : m_bytes(bytes) { }
+					chunk_remove_visitor(file_size bytes) : m_bytes(bytes) {}
 
-					template<typename T>
+					template <typename T>
 					void operator()(T& content) const {
 						content.remove(m_bytes);
 					}
 				};
 
 				struct chunk_get_const_buffer : public boost::static_visitor<caney::optional<boost::asio::const_buffer>> {
-					template<typename T>
+					template <typename T>
 					caney::optional<boost::asio::const_buffer> operator()(T& content) const {
 						return content.get_const_buffer();
 					}
 				};
 			}
 
-			chunk::chunk(memory_chunk&& chunk)
-			: m_value(std::move(chunk)) { }
+			chunk::chunk(memory_chunk&& chunk) : m_value(std::move(chunk)) {}
 
-			chunk::chunk(memory::shared_const_buf&& buffer)
-			: chunk(memory_chunk(std::move(buffer))) { }
+			chunk::chunk(memory::shared_const_buf&& buffer) : chunk(memory_chunk(std::move(buffer))) {}
 
 			file_size chunk::bytes() const {
 				return file_size(boost::get<memory_chunk>(m_value).bytes());
@@ -148,7 +144,6 @@ namespace caney {
 				std::shared_ptr<filter_t> filter = std::make_shared<filter_t>();
 				connect(filter, filter);
 			}
-
 		}
 	} // namespace streams
 } // namespace caney

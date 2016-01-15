@@ -10,9 +10,7 @@ namespace caney {
 			void sink_base::pause() {
 				if (m_is_paused) return;
 				m_is_paused = true;
-				if (m_origin) {
-					m_origin_pause = m_origin->pause();
-				}
+				if (m_origin) { m_origin_pause = m_origin->pause(); }
 			}
 
 			void sink_base::resume() {

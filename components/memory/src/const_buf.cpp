@@ -38,11 +38,9 @@ const_buf::operator boost::asio::const_buffer() const {
 /* raw_const_buf */
 
 raw_const_buf::raw_const_buf(boost::asio::const_buffer data)
-: raw_const_buf(boost::asio::buffer_cast<unsigned char const*>(data), boost::asio::buffer_size(data)) {
-}
+: raw_const_buf(boost::asio::buffer_cast<unsigned char const*>(data), boost::asio::buffer_size(data)) {}
 
 raw_const_buf::raw_const_buf(boost::asio::mutable_buffer data)
-: raw_const_buf(boost::asio::buffer_cast<unsigned char const*>(data), boost::asio::buffer_size(data)) {
-}
+: raw_const_buf(boost::asio::buffer_cast<unsigned char const*>(data), boost::asio::buffer_size(data)) {}
 
 __CANEY_MEMORYV1_END

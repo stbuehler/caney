@@ -33,44 +33,64 @@ public:
 	/**
 	 * @brief size of buffer (length in bytes)
 	 */
-	size_t size() const { return m_size; }
+	size_t size() const {
+		return m_size;
+	}
 
 	/**
 	 * @brief whether buffer is empty (i.e. zero length)
 	 */
-	bool empty() const { return 0 == m_size; }
+	bool empty() const {
+		return 0 == m_size;
+	}
 
 	/**
 	 * @brief whether buffer is not empty (i.e. nonzero length)
 	 */
-	explicit operator bool() const { return !empty(); }
+	explicit operator bool() const {
+		return !empty();
+	}
 
 	/**
 	 * @brief pointer to first byte of data
 	 */
-	unsigned char const* data() const { return m_data; }
+	unsigned char const* data() const {
+		return m_data;
+	}
 
 	/**
 	 @{
 	 * @brief standard iterator getter
 	 */
-	const_iterator begin() const { return m_data; }
-	const_iterator end() const { return m_data + m_size; }
-	const_iterator cbegin() const { return m_data; }
-	const_iterator cend() const { return m_data + m_size; }
+	const_iterator begin() const {
+		return m_data;
+	}
+	const_iterator end() const {
+		return m_data + m_size;
+	}
+	const_iterator cbegin() const {
+		return m_data;
+	}
+	const_iterator cend() const {
+		return m_data + m_size;
+	}
 	/** @} */
 
 	/**
 	 * @brief similar to begin() but returns iterator for `char` access
 	 *     instead of byte (unsigned char)
 	 */
-	char const* char_begin() const { return reinterpret_cast<char const*>(m_data); }
+	char const* char_begin() const {
+		return reinterpret_cast<char const*>(m_data);
+	}
 
 	/**
 	 * @brief similar to end() but returns iterator for `char` access
 	 *     instead of byte (unsigned char)
 	 */
-	char const* char_end() const { return reinterpret_cast<char const*>(m_data) + m_size; }
+	char const* char_end() const {
+		return reinterpret_cast<char const*>(m_data) + m_size;
+	}
 
 	/**
 	 * @brief return byte value at position `ndx` (terminates if range
@@ -136,12 +156,10 @@ protected:
 	const_buf() = default;
 
 	/** initialize with raw data */
-	explicit const_buf(unsigned char const* data, size_t size)
-	: m_data(data), m_size(size) { }
+	explicit const_buf(unsigned char const* data, size_t size) : m_data(data), m_size(size) {}
 
 	/** initialize with raw data */
-	explicit const_buf(char const* data, size_t size)
-	: const_buf(reinterpret_cast<unsigned char const*>(data), size) { }
+	explicit const_buf(char const* data, size_t size) : const_buf(reinterpret_cast<unsigned char const*>(data), size) {}
 
 	/**
 	 * destructor is not virtual as this class is supposed to be
@@ -158,8 +176,7 @@ protected:
 	const_buf& operator=(const_buf const&) = default;
 
 	/** move constructor (cleans up the original) */
-	const_buf(const_buf&& other)
-	: const_buf(other.m_data, other.m_size) {
+	const_buf(const_buf&& other) : const_buf(other.m_data, other.m_size) {
 		other.raw_reset();
 	}
 
@@ -203,7 +220,7 @@ private:
  * @brief implementation of @ref const_buf which does not keep
  *     referenced data alive - in other words, just "raw" pointers.
  */
-class raw_const_buf final: public const_buf {
+class raw_const_buf final : public const_buf {
 public:
 	/** @brief initialize empty buffer */
 	explicit raw_const_buf() = default;
@@ -212,15 +229,13 @@ public:
 	 * @brief initialize from raw pointers - make sure you keep the data
 	 *     around
 	 */
-	explicit raw_const_buf(unsigned char const* data, std::size_t size)
-	: const_buf(data, size) { }
+	explicit raw_const_buf(unsigned char const* data, std::size_t size) : const_buf(data, size) {}
 
 	/**
 	 * @brief initialize from raw pointers - make sure you keep the data
 	 *     around
 	 */
-	explicit raw_const_buf(char const* data, std::size_t size)
-	: const_buf(data, size) { }
+	explicit raw_const_buf(char const* data, std::size_t size) : const_buf(data, size) {}
 
 	/** @brief default copy constructor */
 	raw_const_buf(raw_const_buf const&) = default;
@@ -237,10 +252,8 @@ public:
 	 * @brief initialize with data contained in some container - make
 	 *     sure you keep the container around
 	 */
-	template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
-	explicit raw_const_buf(Container const& data)
-	: const_buf(Storage::data(data), Storage::size(data)) {
-	}
+	template <typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* = nullptr>
+	explicit raw_const_buf(Container const& data) : const_buf(Storage::data(data), Storage::size(data)) {}
 
 	/**
 	 * @brief implicit conversion from `boost::asio::const_buffer`
@@ -263,7 +276,7 @@ public:
 /**
  * @brief create @ref raw_const_buf from string literal
  */
-inline raw_const_buf operator"" _cb(const char *str, std::size_t len) {
+inline raw_const_buf operator"" _cb(const char* str, std::size_t len) {
 	return raw_const_buf(str, len);
 }
 

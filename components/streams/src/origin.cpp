@@ -5,9 +5,7 @@ namespace caney {
 		inline namespace v1 {
 			class origin::pause_watcher {
 			public:
-				pause_watcher(origin* origin)
-				: m_origin(origin) {
-				}
+				pause_watcher(origin* origin) : m_origin(origin) {}
 				pause_watcher(pause_watcher const&) = delete;
 				pause_watcher& operator=(pause_watcher const&) = delete;
 

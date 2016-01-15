@@ -4,9 +4,9 @@
 
 #include "internal.hpp"
 
-#include <mutex>
 #include <condition_variable>
 #include <list>
+#include <mutex>
 
 #include <boost/noncopyable.hpp>
 
@@ -17,7 +17,7 @@ __CANEY_STDV1_BEGIN
  *
  * @tparam Value values stored in the queue
  */
-template<typename Value>
+template <typename Value>
 class wqueue : private boost::noncopyable {
 public:
 	/** value type stored in the queue */
@@ -31,7 +31,7 @@ public:
 	 * of the queue, then wakes up one thread @ref wait() -ing for new
 	 * values (if there is any).
 	 */
-	template<typename... Args>
+	template <typename... Args>
 	void emplace(Args&&... args) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);

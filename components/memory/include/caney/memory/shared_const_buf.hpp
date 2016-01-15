@@ -16,7 +16,7 @@ __CANEY_MEMORYV1_BEGIN
  *
  * This should be used to store buffer long term (i.e. on the heap).
  */
-class shared_const_buf final: public const_buf {
+class shared_const_buf final : public const_buf {
 public:
 	/** @brief various underlying types that can keep a buffer alive */
 	typedef boost::variant<std::shared_ptr<void>, intrusive_buffer_ptr> storage_t;
@@ -40,7 +40,7 @@ public:
 	~shared_const_buf() = default;
 
 	/** @brief move data from container into buffer */
-	template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
+	template <typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* = nullptr>
 	explicit shared_const_buf(Container&& data) {
 		std::shared_ptr<Container> storage = std::make_shared<Container>(std::move(data));
 		raw_set(Storage::data(*storage), Storage::size(*storage));
@@ -57,7 +57,7 @@ public:
 	static shared_const_buf copy(const_buf const& buffer);
 
 	/** @brief create new buffer from data in a container (copies the data) */
-	template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
+	template <typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* = nullptr>
 	static shared_const_buf copy(Container const& data) {
 		return copy(Storage::data(data), Storage::size(data));
 	}

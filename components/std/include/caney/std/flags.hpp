@@ -6,9 +6,9 @@
 #include "internal.hpp"
 
 #include <array>
+#include <climits>
 #include <cstdint>
 #include <limits>
-#include <climits>
 
 __CANEY_STDV1_BEGIN
 
@@ -18,7 +18,8 @@ __CANEY_STDV1_BEGIN
  *
  * The base enum defines the indices to look up in a bitset; you should use an enum class so there are no predefined (and wrong) bit-wise operators.
  *
- * Bit operations |, & and ^ usually work on the complete bitset; only &, when one parameter is a single flag, will simply test whether the flag is set and return a boolean.
+ * Bit operations |, & and ^ usually work on the complete bitset; only &, when one parameter is a single flag, will simply test whether the flag is set and
+ * return a boolean.
  *
  * Example:
  * @code
@@ -41,66 +42,73 @@ __CANEY_STDV1_BEGIN
 /**
  * @brief Define standard bitwise operators on `Flags`.
  */
-#define CANEY_FLAGS(Flags) \
-	/**
-	 * @brief return bitset where flag `a` and `b` are set
-	 * @param a single flag
-	 * @param b single flag
-	 * @return bitset
-	 */ \
-	Flags operator|(Flags::flag_t a, Flags::flag_t b) { return Flags(a) | b; } \
-	/**
-	 * @brief return bitset where flag `a` and all set bits in `b` are set
-	 * @param a single flag
-	 * @param b bitset
-	 * @return bitset
-	 */ \
-	Flags operator|(Flags::flag_t a, Flags b) { return Flags(a) | b; } \
-	/**
-	 * @brief deleted
-	 * @internal
-	 */ \
-	bool operator&(Flags::flag_t a, Flags::flag_t b) = delete; \
-	/**
-	 * @brief check whether `a` is set in b
-	 * @param a single flag
-	 * @param b bitset
-	 * @return whether `a` is set in b
-	 */ \
-	bool operator&(Flags::flag_t a, Flags b) { return b & a; } \
-	/**
-	 * @brief toggle `a` in bitset from single flag `b` (or vice versa)
-	 * @param a single flag
-	 * @param b single flag
-	 * @return empty bitset if `a == b` otherwise `a | b`
-	 */ \
-	Flags operator^(Flags::flag_t a, Flags::flag_t b) { return Flags(a) ^ b; } \
-	/**
-	 * @brief toggle `a` in `b`
-	 * @param a single flag
-	 * @param b bitset
-	 * @return `b` but with flag `a` negated
-	 */ \
-	Flags operator^(Flags::flag_t a, Flags b) { return Flags(a) ^ b; } \
-	/**
-	 * @brief negate all bits
-	 * @param a bitset
-	 * @return inverse to `a`
-	 */ \
-	Flags operator~(Flags::flag_t a) { return ~Flags(a); }
+#define CANEY_FLAGS(Flags)                                                                                                                                     \
+	/**                                                                                                                                                        \
+	 * @brief return bitset where flag `a` and `b` are set                                                                                                     \
+	 * @param a single flag                                                                                                                                    \
+	 * @param b single flag                                                                                                                                    \
+	 * @return bitset                                                                                                                                          \
+	 */                                                                                                                                                        \
+	Flags operator|(Flags::flag_t a, Flags::flag_t b) {                                                                                                        \
+		return Flags(a) | b;                                                                                                                                   \
+	}                                                                                                                                                          \
+	/**                                                                                                                                                        \
+	 * @brief return bitset where flag `a` and all set bits in `b` are set                                                                                     \
+	 * @param a single flag                                                                                                                                    \
+	 * @param b bitset                                                                                                                                         \
+	 * @return bitset                                                                                                                                          \
+	 */                                                                                                                                                        \
+	Flags operator|(Flags::flag_t a, Flags b) {                                                                                                                \
+		return Flags(a) | b;                                                                                                                                   \
+	}                                                                                                                                                          \
+	/**                                                                                                                                                        \
+	 * @brief deleted                                                                                                                                          \
+	 * @internal                                                                                                                                               \
+	 */                                                                                                                                                        \
+	bool operator&(Flags::flag_t a, Flags::flag_t b) = delete;                                                                                                 \
+	/**                                                                                                                                                        \
+	 * @brief check whether `a` is set in b                                                                                                                    \
+	 * @param a single flag                                                                                                                                    \
+	 * @param b bitset                                                                                                                                         \
+	 * @return whether `a` is set in b                                                                                                                         \
+	 */                                                                                                                                                        \
+	bool operator&(Flags::flag_t a, Flags b) {                                                                                                                 \
+		return b & a;                                                                                                                                          \
+	}                                                                                                                                                          \
+	/**                                                                                                                                                        \
+	 * @brief toggle `a` in bitset from single flag `b` (or vice versa)                                                                                        \
+	 * @param a single flag                                                                                                                                    \
+	 * @param b single flag                                                                                                                                    \
+	 * @return empty bitset if `a == b` otherwise `a | b`                                                                                                      \
+	 */                                                                                                                                                        \
+	Flags operator^(Flags::flag_t a, Flags::flag_t b) {                                                                                                        \
+		return Flags(a) ^ b;                                                                                                                                   \
+	}                                                                                                                                                          \
+	/**                                                                                                                                                        \
+	 * @brief toggle `a` in `b`                                                                                                                                \
+	 * @param a single flag                                                                                                                                    \
+	 * @param b bitset                                                                                                                                         \
+	 * @return `b` but with flag `a` negated                                                                                                                   \
+	 */                                                                                                                                                        \
+	Flags operator^(Flags::flag_t a, Flags b) {                                                                                                                \
+		return Flags(a) ^ b;                                                                                                                                   \
+	}                                                                                                                                                          \
+	/**                                                                                                                                                        \
+	 * @brief negate all bits                                                                                                                                  \
+	 * @param a bitset                                                                                                                                         \
+	 * @return inverse to `a`                                                                                                                                  \
+	 */                                                                                                                                                        \
+	Flags operator~(Flags::flag_t a) {                                                                                                                         \
+		return ~Flags(a);                                                                                                                                      \
+	}
 
 namespace impl {
 	// idea from http://stackoverflow.com/a/10724828/1478356
-	template<typename Enum, bool B = std::is_enum<Enum>::value>
-	struct is_scoped_enum : std::false_type {
-	};
+	template <typename Enum, bool B = std::is_enum<Enum>::value>
+	struct is_scoped_enum : std::false_type {};
 
-	template<typename Enum>
-	struct is_scoped_enum<Enum, true>
-		: std::integral_constant<
-			bool,
-			!std::is_convertible<Enum, std::underlying_type_t<Enum>>::value> {
-	};
+	template <typename Enum>
+	struct is_scoped_enum<Enum, true> : std::integral_constant<bool, !std::is_convertible<Enum, std::underlying_type_t<Enum>>::value> {};
 }
 
 /**
@@ -110,10 +118,11 @@ namespace impl {
  * @tparam Size index of smallest invalid flag value (the first after all flag values), only required if `FlagEnum` doesn't contain a correct `Last` member
  * @tparam Elem underlying storage type for bitset (defaults to uint32_t, must be unsigned integer)
  */
-template<typename FlagEnum, std::size_t Size = static_cast<std::size_t>(FlagEnum::Last) + 1, typename Elem = std::uint32_t>
+template <typename FlagEnum, std::size_t Size = static_cast<std::size_t>(FlagEnum::Last) + 1, typename Elem = std::uint32_t>
 class flags {
 private:
 	typedef std::underlying_type_t<FlagEnum> enum_t;
+
 public:
 	static_assert(impl::is_scoped_enum<FlagEnum>::value, "Only scoped enums allowed");
 	static_assert(!std::numeric_limits<enum_t>::is_signed, "Only enums with unsigned underlying types allowed");
@@ -122,10 +131,10 @@ public:
 
 	static_assert(8 == CHAR_BIT, "byte should have exactly 8 bits");
 	/// number of bits in underlying storage type
-	static constexpr std::size_t BITS_PER_ELEM = sizeof(Elem)*CHAR_BIT;
+	static constexpr std::size_t BITS_PER_ELEM = sizeof(Elem) * CHAR_BIT;
 
 	/// number of entries needed to store all bits
-	static constexpr std::size_t ARRAY_SIZE = (Size + BITS_PER_ELEM - 1)/BITS_PER_ELEM;
+	static constexpr std::size_t ARRAY_SIZE = (Size + BITS_PER_ELEM - 1) / BITS_PER_ELEM;
 	static_assert(ARRAY_SIZE > 0, "Invalid array size");
 
 	/// usable bits in last entry (set bit = usable, unset bit = not usable); not usable bits should be zero
@@ -198,9 +207,7 @@ public:
 
 	private:
 		friend class flags<FlagEnum, Size, Elem>;
-		explicit reference(Elem& elem, Elem mask)
-		: m_elem(&elem), m_mask(mask) {
-		}
+		explicit reference(Elem& elem, Elem mask) : m_elem(&elem), m_mask(mask) {}
 
 		Elem* m_elem;
 		Elem m_mask;
@@ -212,16 +219,13 @@ public:
 	 * @brief copy from underyling storage `raw`
 	 * @param raw bits to copy
 	 */
-	explicit flags(array_t const& raw)
-	: m_array(raw) {
-	}
+	explicit flags(array_t const& raw) : m_array(raw) {}
 
 	/**
 	 * @brief construct bitset containing a single flag (set a single bit)
 	 * @param flag bit to set in bitset
 	 */
-	flags(flag_t flag)
-	{
+	flags(flag_t flag) {
 		set(flag);
 	}
 
@@ -326,9 +330,7 @@ public:
 	 * @return *this
 	 */
 	flags& operator&=(flags const& other) {
-		for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-			m_array[i] &= other.m_array[i];
-		}
+		for (size_t i = 0; i < ARRAY_SIZE; ++i) { m_array[i] &= other.m_array[i]; }
 		return *this;
 	}
 
@@ -337,7 +339,11 @@ public:
 	 * @param other bits which are not cleared
 	 * @return copy with bits not in `other` cleared
 	 */
-	CANEY_RELAXED_CONSTEXPR flags operator&(flags const& other) const { flags tmp(*this); tmp &= other; return tmp; }
+	CANEY_RELAXED_CONSTEXPR flags operator&(flags const& other) const {
+		flags tmp(*this);
+		tmp &= other;
+		return tmp;
+	}
 
 	/**
 	 * @brief set single flag in bitset
@@ -354,9 +360,7 @@ public:
 	 * @return *this
 	 */
 	flags& operator|=(flags const& other) {
-		for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-			m_array[i] |= other.m_array[i];
-		}
+		for (size_t i = 0; i < ARRAY_SIZE; ++i) { m_array[i] |= other.m_array[i]; }
 		return *this;
 	}
 
@@ -365,7 +369,11 @@ public:
 	 * @param other bits to set
 	 * @return copy with new bits set
 	 */
-	CANEY_RELAXED_CONSTEXPR flags operator|(flags const& other) const { flags tmp(*this); tmp |= other; return tmp; }
+	CANEY_RELAXED_CONSTEXPR flags operator|(flags const& other) const {
+		flags tmp(*this);
+		tmp |= other;
+		return tmp;
+	}
 
 	/**
 	 * @brief flip single flag in bitset
@@ -382,9 +390,7 @@ public:
 	 * @return *this
 	 */
 	flags& operator^=(flags const& other) {
-		for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-			m_array[i] ^= other.m_array[i];
-		}
+		for (size_t i = 0; i < ARRAY_SIZE; ++i) { m_array[i] ^= other.m_array[i]; }
 		return *this;
 	}
 
@@ -393,7 +399,11 @@ public:
 	 * @param other bits to flip
 	 * @return copy with flipped bits
 	 */
-	CANEY_RELAXED_CONSTEXPR flags operator^(flags const& other) const { flags tmp(*this); tmp ^= other; return tmp; }
+	CANEY_RELAXED_CONSTEXPR flags operator^(flags const& other) const {
+		flags tmp(*this);
+		tmp ^= other;
+		return tmp;
+	}
 
 	/**
 	 * @brief copy and flip all bits
@@ -409,10 +419,8 @@ public:
 	 * @brief flip all bits
 	 */
 	void flip_all() {
-		for (size_t i = 0; i < ARRAY_SIZE - 1; ++i) {
-			m_array[i] = ~m_array[i];
-		}
-		m_array[ARRAY_SIZE-1] ^= LAST_ENTRY_MASK;
+		for (size_t i = 0; i < ARRAY_SIZE - 1; ++i) { m_array[i] = ~m_array[i]; }
+		m_array[ARRAY_SIZE - 1] ^= LAST_ENTRY_MASK;
 	}
 
 	/**
@@ -439,7 +447,7 @@ public:
 		for (size_t i = 0; i < ARRAY_SIZE - 1; ++i) {
 			if (0 != ~m_array[i]) return false;
 		}
-		return m_array[ARRAY_SIZE-1] == LAST_ENTRY_MASK;
+		return m_array[ARRAY_SIZE - 1] == LAST_ENTRY_MASK;
 	}
 
 	/**
@@ -465,7 +473,7 @@ private:
 };
 
 #if defined(DOXYGEN)
-	CANEY_FLAGS(flags<FlagEnum>)
+CANEY_FLAGS(flags<FlagEnum>)
 #endif
 
 /** @} */

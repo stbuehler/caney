@@ -9,10 +9,10 @@
 __CANEY_MEMORYV1_BEGIN
 
 namespace impl {
-	template<typename Storage>
+	template <typename Storage>
 	struct buffer_storage;
 
-	template<typename Char, typename Traits, typename Allocator>
+	template <typename Char, typename Traits, typename Allocator>
 	struct string_buffer_storage {
 		typedef std::basic_string<Char, Traits, Allocator> container_t;
 
@@ -29,15 +29,13 @@ namespace impl {
 		}
 	};
 
-	template<typename Traits, typename Allocator>
-	struct buffer_storage<std::basic_string<char, Traits, Allocator>> : string_buffer_storage<char, Traits, Allocator> {
-	};
+	template <typename Traits, typename Allocator>
+	struct buffer_storage<std::basic_string<char, Traits, Allocator>> : string_buffer_storage<char, Traits, Allocator> {};
 
-	template<typename Traits, typename Allocator>
-	struct buffer_storage<std::basic_string<unsigned char, Traits, Allocator>> : string_buffer_storage<unsigned char, Traits, Allocator> {
-	};
+	template <typename Traits, typename Allocator>
+	struct buffer_storage<std::basic_string<unsigned char, Traits, Allocator>> : string_buffer_storage<unsigned char, Traits, Allocator> {};
 
-	template<typename Char, typename Allocator>
+	template <typename Char, typename Allocator>
 	struct vector_buffer_storage {
 		typedef std::vector<Char, Allocator> container_t;
 
@@ -54,13 +52,11 @@ namespace impl {
 		}
 	};
 
-	template<typename Allocator>
-	struct buffer_storage<std::vector<char, Allocator>> : vector_buffer_storage<char, Allocator> {
-	};
+	template <typename Allocator>
+	struct buffer_storage<std::vector<char, Allocator>> : vector_buffer_storage<char, Allocator> {};
 
-	template<typename Allocator>
-	struct buffer_storage<std::vector<unsigned char, Allocator>> : vector_buffer_storage<unsigned char, Allocator> {
-	};
+	template <typename Allocator>
+	struct buffer_storage<std::vector<unsigned char, Allocator>> : vector_buffer_storage<unsigned char, Allocator> {};
 } // namespace impl
 
 __CANEY_MEMORYV1_END

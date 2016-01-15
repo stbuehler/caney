@@ -17,13 +17,14 @@
 __CANEY_MEMORYV1_BEGIN
 
 namespace impl {
-	template<typename Allocator, typename T>
+	template <typename Allocator, typename T>
 	class allocator_extent : public Allocator {
 	private:
 		using allocator_t = typename std::allocator_traits<Allocator>::template rebind_alloc<T>;
 		using inner_traits = typename std::allocator_traits<allocator_t>;
+
 	public:
-		template<typename U>
+		template <typename U>
 		struct rebind {
 			using other = allocator_extent<typename inner_traits::template rebind_alloc<U>, U>;
 		};
@@ -37,14 +38,10 @@ namespace impl {
 		allocator_extent(allocator_extent&&) = default;
 		allocator_extent& operator=(allocator_extent&&) = delete;
 
-		explicit allocator_extent(Allocator const& alloc, size_type extent)
-		: Allocator(alloc), m_extent(extent) {
-		}
+		explicit allocator_extent(Allocator const& alloc, size_type extent) : Allocator(alloc), m_extent(extent) {}
 
-		template<typename _Alloc, typename _T>
-		explicit allocator_extent(allocator_extent<_Alloc, _T> const& alloc)
-		: Allocator(alloc), m_extent(alloc.extent()) {
-		}
+		template <typename _Alloc, typename _T>
+		explicit allocator_extent(allocator_extent<_Alloc, _T> const& alloc) : Allocator(alloc), m_extent(alloc.extent()) {}
 
 		size_type extent() const {
 			return m_extent;
@@ -74,8 +71,7 @@ namespace impl {
 		}
 
 		friend bool operator==(allocator_extent const& a, allocator_extent const& b) {
-			return static_cast<Allocator const&>(a) == static_cast<Allocator const&>(b)
-				&& a.extent() == b.extent();
+			return static_cast<Allocator const&>(a) == static_cast<Allocator const&>(b) && a.extent() == b.extent();
 		}
 		friend bool operator!=(allocator_extent const& a, allocator_extent const& b) {
 			return !(a == b);
@@ -88,11 +84,11 @@ namespace impl {
 
 
 /* forward declarations */
-template<typename CounterPolicyT = boost::thread_safe_counter, typename AllocatorT = std::allocator<void>>
+template <typename CounterPolicyT = boost::thread_safe_counter, typename AllocatorT = std::allocator<void>>
 class generic_intrusive_buffer;
 
 /** generic intrusive buffer pointer type */
-template<typename CounterPolicyT = boost::thread_safe_counter, typename AllocatorT = std::allocator<void>>
+template <typename CounterPolicyT = boost::thread_safe_counter, typename AllocatorT = std::allocator<void>>
 using generic_intrusive_buffer_ptr = boost::intrusive_ptr<generic_intrusive_buffer<CounterPolicyT, AllocatorT>>;
 
 /** simple intrusive buffer type */
@@ -110,12 +106,13 @@ using intrusive_buffer_ptr = generic_intrusive_buffer_ptr<>;
  * @tparam AllocatorT allocator to use
  * @tparam CounterPolicyT counter policy to use for intrusive counter
  */
-template<typename CounterPolicyT, typename AllocatorT>
-class generic_intrusive_buffer final : public intrusive_base<generic_intrusive_buffer<CounterPolicyT, AllocatorT>, CounterPolicyT, impl::allocator_extent<AllocatorT, void>>
-{
+template <typename CounterPolicyT, typename AllocatorT>
+class generic_intrusive_buffer final
+	: public intrusive_base<generic_intrusive_buffer<CounterPolicyT, AllocatorT>, CounterPolicyT, impl::allocator_extent<AllocatorT, void>> {
 private:
 	using self_t = generic_intrusive_buffer<CounterPolicyT, AllocatorT>;
 	using base_t = intrusive_base<generic_intrusive_buffer<CounterPolicyT, AllocatorT>, CounterPolicyT, impl::allocator_extent<AllocatorT, void>>;
+
 public:
 	/** iterator type */
 	typedef unsigned char* iterator;
@@ -133,28 +130,43 @@ public:
 	 * use @ref allocate() or @ref create() instead
 	 * @internal
 	 */
-	explicit generic_intrusive_buffer(caney::private_tag_t) {
-	}
+	explicit generic_intrusive_buffer(caney::private_tag_t) {}
 
 	/** @brief size of buffer */
-	size_type size() const { return this->allocator().extent(); }
+	size_type size() const {
+		return this->allocator().extent();
+	}
 	/** @brief whether buffer is empty */
-	bool empty() const { return 0 == size(); }
+	bool empty() const {
+		return 0 == size();
+	}
 	/** @brief whether buffer is not empty */
-	explicit operator bool() const { return !empty(); }
+	explicit operator bool() const {
+		return !empty();
+	}
 
 	/** @brief pointer to buffer memory */
 	/* the buffer data region starts directly after the meta object */
-	unsigned char* data() const { return const_cast<unsigned char*>(reinterpret_cast<unsigned char const*>(this + 1)); }
+	unsigned char* data() const {
+		return const_cast<unsigned char*>(reinterpret_cast<unsigned char const*>(this + 1));
+	}
 
 	/**
 	 * @{
 	 * @brief standard iterator
 	 */
-	iterator begin() const { return data(); }
-	iterator end() const { return data() + size(); }
-	const_iterator cbegin() const { return data(); }
-	const_iterator cend() const { return data() + size(); }
+	iterator begin() const {
+		return data();
+	}
+	iterator end() const {
+		return data() + size();
+	}
+	const_iterator cbegin() const {
+		return data();
+	}
+	const_iterator cend() const {
+		return data() + size();
+	}
 	/** @} */
 
 	/** @brief (range-checked) access to buffer element */

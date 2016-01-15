@@ -14,17 +14,17 @@ namespace caney {
 				 * leading '-', and no leading zeroes. The zero values must be represented as
 				 * "0", not "-0" and not "".
 				 */
-				explicit big_number(memory::shared_const_buf raw)
-				: m_raw(raw) {
-				}
+				explicit big_number(memory::shared_const_buf raw) : m_raw(raw) {}
 
 				explicit big_number(std::uintmax_t value);
 				explicit big_number(std::intmax_t value);
 
 				/* decimal representation */
-				memory::shared_const_buf const& raw() const { return m_raw; }
+				memory::shared_const_buf const& raw() const {
+					return m_raw;
+				}
 
-				template<typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
+				template <typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
 				caney::optional<Integral> try_decode() const {
 					return util::parse_integral<Integral>(m_raw);
 				}
@@ -52,7 +52,7 @@ namespace caney {
 			caney::optional<memory::shared_const_buf> parse_item(memory::shared_const_buf& buf);
 
 			// all parsers have to be defined in the bencoded namespace
-			template<typename Result, class Enable = void>
+			template <typename Result, class Enable = void>
 			struct parser;
 			/* {
 			 *     // return parsed value if successful; also must remove parsed data from buf
@@ -61,7 +61,7 @@ namespace caney {
 			 */
 
 			// removes parsed data from buf (only if successful)
-			template<typename Result>
+			template <typename Result>
 			caney::optional<Result> parse(memory::shared_const_buf& buf) {
 				memory::shared_const_buf bufCopy{buf};
 				caney::optional<Result> result;
@@ -71,25 +71,22 @@ namespace caney {
 			}
 
 			/* parse shared_const_buffer as "string" data */
-			template<>
-			struct parser<memory::shared_const_buf>
-			{
+			template <>
+			struct parser<memory::shared_const_buf> {
 				static caney::optional<memory::shared_const_buf> parse(memory::shared_const_buf& buf) {
 					return parse_string(buf);
 				}
 			};
 
-			template<>
-			struct parser<big_number>
-			{
+			template <>
+			struct parser<big_number> {
 				static caney::optional<big_number> parse(memory::shared_const_buf& buf) {
 					return parse_integral(buf);
 				}
 			};
 
-			template<typename Integral>
-			struct parser<Integral, std::enable_if_t<std::is_integral<Integral>::value>>
-			{
+			template <typename Integral>
+			struct parser<Integral, std::enable_if_t<std::is_integral<Integral>::value>> {
 				static caney::optional<Integral> parse(memory::shared_const_buf& buf) {
 					caney::optional<big_number> big = parse_integral(buf);
 					if (!big) return caney::nullopt;
@@ -97,7 +94,7 @@ namespace caney {
 				}
 			};
 
-			template<typename Entry>
+			template <typename Entry>
 			struct parser<std::vector<Entry>> {
 				static caney::optional<std::vector<Entry>> parse(memory::shared_const_buf& buf) {
 					if (token::List != peek_token(buf)) return caney::nullopt;

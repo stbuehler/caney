@@ -18,13 +18,13 @@ namespace caney {
 						// negative numbers are at least 3 characters ('-1' + delim);
 						// no leading zeroes; '-' never can be followed by a zero
 						if (buf.size() < start + 3 || '0' == buf[i]) return caney::nullopt;
-					} else if ('0' == buf[i] && delim != buf[i+1]) {
+					} else if ('0' == buf[i] && delim != buf[i + 1]) {
 						// no leading zeroes allowed; exception '0' followed by the delimiter
 						return caney::nullopt;
 					}
 					for (; i < buf.size(); ++i) {
 						if (delim == buf[i]) {
-							std::cerr << "integer is at slice(" << start << ", " << (i-1) << ") of '" << buf.data() << "' (length " << buf.size() << ")\n";
+							std::cerr << "integer is at slice(" << start << ", " << (i - 1) << ") of '" << buf.data() << "' (length " << buf.size() << ")\n";
 							caney::optional<big_number> result{big_number{buf.shared_slice(start, i - 1)}};
 							buf = buf.shared_slice(i + 1);
 							return result;
@@ -35,13 +35,9 @@ namespace caney {
 				}
 			} // anonymous namespace
 
-			big_number::big_number(std::uintmax_t value)
-			: m_raw(caney::util::to_string(value)) {
-			}
+			big_number::big_number(std::uintmax_t value) : m_raw(caney::util::to_string(value)) {}
 
-			big_number::big_number(std::intmax_t value)
-			: m_raw(caney::util::to_string(value)) {
-			}
+			big_number::big_number(std::intmax_t value) : m_raw(caney::util::to_string(value)) {}
 
 			token peek_token(memory::shared_const_buf const& buf) {
 				if (buf.empty()) return token::Error;

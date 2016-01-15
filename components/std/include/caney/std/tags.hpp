@@ -26,7 +26,7 @@ __CANEY_STDV1_BEGIN
 struct private_tag_t {
 	//! @cond INTERNAL
 	enum class tag_t { tag };
-	explicit constexpr private_tag_t(tag_t) { };
+	explicit constexpr private_tag_t(tag_t){};
 	//! @endcond
 };
 
@@ -38,8 +38,7 @@ constexpr private_tag_t private_tag{private_tag_t::tag_t::tag};
 /**
  * @brief tag type to signal constructing some internal element from following arguments
  */
-struct in_place_t {
-};
+struct in_place_t {};
 
 /**
  * @brief @ref in_place_t instance

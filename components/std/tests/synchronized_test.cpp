@@ -14,9 +14,7 @@ BOOST_AUTO_TEST_CASE(synchronized_no_assign) {
 	BOOST_CHECK_EQUAL(*sync_value.shared_synchronize().operator->(), 1);
 
 	sync_value.synchronize().get() = 9;
-	sync_value.shared_synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 9);
-	});
+	sync_value.shared_synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 9); });
 	*sync_value.synchronize() = 10;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 10);
 
@@ -26,9 +24,7 @@ BOOST_AUTO_TEST_CASE(synchronized_no_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 11);
 	sync_value.synchronize().get() = 12;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 12);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 12); });
 	*sync_value.synchronize() = 13;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 13);
 
@@ -58,9 +54,7 @@ BOOST_AUTO_TEST_CASE(synchronized_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 8);
 	sync_value.synchronize().get() = 9;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 9);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 9); });
 	*sync_value.synchronize() = 10;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 10);
 
@@ -70,9 +64,7 @@ BOOST_AUTO_TEST_CASE(synchronized_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 11);
 	sync_value.synchronize().get() = 12;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 12);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 12); });
 	*sync_value.synchronize() = 13;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 13);
 
@@ -111,9 +103,7 @@ BOOST_AUTO_TEST_CASE(shared_synchronized_no_assign) {
 	BOOST_CHECK_EQUAL(*sync_value.shared_synchronize().operator->(), 1);
 
 	sync_value.synchronize().get() = 9;
-	sync_value.shared_synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 9);
-	});
+	sync_value.shared_synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 9); });
 	*sync_value.synchronize() = 10;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 10);
 
@@ -123,9 +113,7 @@ BOOST_AUTO_TEST_CASE(shared_synchronized_no_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 11);
 	sync_value.synchronize().get() = 12;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 12);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 12); });
 	*sync_value.synchronize() = 13;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 13);
 
@@ -155,9 +143,7 @@ BOOST_AUTO_TEST_CASE(shared_synchronized_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 8);
 	sync_value.synchronize().get() = 9;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 9);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 9); });
 	*sync_value.synchronize() = 10;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 10);
 
@@ -167,9 +153,7 @@ BOOST_AUTO_TEST_CASE(shared_synchronized_assign) {
 	});
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 11);
 	sync_value.synchronize().get() = 12;
-	sync_value.synchronize([](uint32_t const& value) {
-		BOOST_CHECK_EQUAL(value, 12);
-	});
+	sync_value.synchronize([](uint32_t const& value) { BOOST_CHECK_EQUAL(value, 12); });
 	*sync_value.synchronize() = 13;
 	BOOST_CHECK_EQUAL(*sync_value.synchronize(), 13);
 

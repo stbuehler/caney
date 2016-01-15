@@ -4,8 +4,7 @@ namespace caney {
 	namespace streams {
 		inline namespace v1 {
 			file_chunk::file_chunk(std::shared_ptr<file_handle> handle, file_size offset, file_size length)
-			: m_handle(handle), m_offset(offset), m_length(length) {
-			}
+			: m_handle(handle), m_offset(offset), m_length(length) {}
 
 			file_chunk file_chunk::split(file_size bytes) {
 				if (bytes > m_length) std::terminate();
@@ -27,7 +26,6 @@ namespace caney {
 					// callback({}, memory::make_unique_buffer<0>());
 				}
 			}
-
 		}
 	} // namespace streams
 } // namespace caney

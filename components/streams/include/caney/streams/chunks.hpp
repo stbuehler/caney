@@ -2,8 +2,8 @@
 
 #include "caney/memory/buffer.hpp"
 
-#include "generic_chunks.hpp"
 #include "file_chunk.hpp"
+#include "generic_chunks.hpp"
 
 #include <list>
 
@@ -76,7 +76,7 @@ namespace caney {
 				container_t m_queue;
 			};
 
-			template<>
+			template <>
 			struct chunk_traits_t<chunk> {
 				using chunks_t = chunk_queue;
 

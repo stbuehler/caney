@@ -26,12 +26,12 @@ __CANEY_UTILV1_BEGIN
  * @tparam Integral integer type (signed or unsigned)
  * @param str string to parse
  */
-template<typename Integral>
+template <typename Integral>
 caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str);
 
 #else // defined(DOXYGEN)
 
-template<typename Integral, std::enable_if_t<std::is_signed<Integral>::value>* = nullptr>
+template <typename Integral, std::enable_if_t<std::is_signed<Integral>::value>* = nullptr>
 caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
 	unsigned char constexpr digit_0{'0'};
 	Integral constexpr Min = std::numeric_limits<Integral>::min();
@@ -43,7 +43,7 @@ caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
 		strCopy = strCopy.raw_slice(1);
 		if (strCopy.empty()) return caney::nullopt;
 		Integral result = 0;
-		for (auto const &c: strCopy) {
+		for (auto const& c : strCopy) {
 			unsigned char const digit = c - digit_0;
 			if (CANEY_UNLIKELY(digit > 9)) {
 				if (&c == strCopy.begin()) return caney::nullopt;
@@ -59,7 +59,7 @@ caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
 		return result;
 	} else {
 		Integral result = 0;
-		for (auto c: strCopy) {
+		for (auto c : strCopy) {
 			unsigned char const digit = c - digit_0;
 			if (CANEY_UNLIKELY(digit > 9)) {
 				if (&c == strCopy.begin()) return caney::nullopt;
@@ -75,14 +75,14 @@ caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
 	}
 }
 
-template<typename Integral, std::enable_if_t<std::is_unsigned<Integral>::value>* = nullptr>
+template <typename Integral, std::enable_if_t<std::is_unsigned<Integral>::value>* = nullptr>
 caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
 	unsigned char constexpr digit_0{'0'};
 	Integral constexpr Max = std::numeric_limits<Integral>::max();
 
 	if (str.empty()) return caney::nullopt;
 	Integral result = 0;
-	for (auto c: str) {
+	for (auto c : str) {
 		unsigned char const digit = c - digit_0;
 		if (CANEY_UNLIKELY(digit > 9)) {
 			if (&c == str.begin()) return caney::nullopt;
@@ -111,7 +111,7 @@ caney::optional<Integral> parse_integral_open(memory::raw_const_buf& str) {
  * @tparam Integral integer type (signed or unsigned)
  * @param str string to parse
  */
-template<typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
+template <typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
 caney::optional<Integral> parse_integral(memory::const_buf const& str) {
 	memory::raw_const_buf buf = str.raw_copy();
 	caney::optional<Integral> result = parse_integral_open<Integral>(buf);

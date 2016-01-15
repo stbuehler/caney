@@ -4,8 +4,7 @@
 
 __CANEY_MEMORYV1_BEGIN
 
-unique_buf::unique_buf(unique_buf&& other)
-: mutable_buf(other), m_storage(std::move(other.m_storage)) {
+unique_buf::unique_buf(unique_buf&& other) : mutable_buf(other), m_storage(std::move(other.m_storage)) {
 	other.raw_reset();
 }
 
@@ -62,8 +61,6 @@ unique_buf unique_buf::slice(size_t from)&& {
 }
 
 unique_buf::unique_buf(intrusive_buffer_ptr buffer)
-: mutable_buf(buffer ? buffer->data() : nullptr, buffer ? buffer->size() : 0)
-, m_storage(std::move(buffer)) {
-}
+: mutable_buf(buffer ? buffer->data() : nullptr, buffer ? buffer->size() : 0), m_storage(std::move(buffer)) {}
 
 __CANEY_MEMORYV1_END

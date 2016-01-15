@@ -44,7 +44,7 @@ __CANEY_STDV1_BEGIN
  *     // typeof(i) == uint32_t
  * @endcode
  */
-template<typename Enum>
+template <typename Enum>
 constexpr typename std::underlying_type<Enum>::type from_enum(Enum val) {
 	return static_cast<typename std::underlying_type<Enum>::type>(val);
 }
@@ -63,21 +63,19 @@ constexpr typename std::underlying_type<Enum>::type from_enum(Enum val) {
  *     // typeof(e) == MyEnum
  * @endcode
  */
-template<typename Enum>
+template <typename Enum>
 constexpr Enum to_enum(typename std::underlying_type<Enum>::type val) {
 	return static_cast<Enum>(val);
 }
 
 namespace impl {
-	template<typename Integral>
+	template <typename Integral>
 	class to_enum_wrapper {
 	public:
-		constexpr explicit to_enum_wrapper(Integral value)
-		: m_value(value) {
-		}
+		constexpr explicit to_enum_wrapper(Integral value) : m_value(value) {}
 
 		// implicit cast operator!
-		template<typename Enum>
+		template <typename Enum>
 		operator Enum() {
 			return to_enum<Enum>(m_value);
 		}
@@ -100,10 +98,10 @@ namespace impl {
  *     MyEnum e = to_enum(i);
  * @endcode
  */
-template<typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
+template <typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
 constexpr impl_defined to_enum(Integral value);
 #else
-template<typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
+template <typename Integral, std::enable_if_t<std::is_integral<Integral>::value>* = nullptr>
 constexpr impl::to_enum_wrapper<Integral> to_enum(Integral value) {
 	return impl::to_enum_wrapper<Integral>(value);
 }

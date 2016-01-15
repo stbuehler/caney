@@ -98,10 +98,10 @@ BOOST_AUTO_TEST_CASE(iterators) {
 	BOOST_CHECK_EQUAL(a.back(), 65537);
 
 	auto& x = a.array();
-	(void)x;
+	(void) x;
 
 	auto&& y = std::move(a).array();
-	(void)y;
+	(void) y;
 }
 
 BOOST_AUTO_TEST_CASE(const_iterators) {
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(const_iterators) {
 	BOOST_CHECK_EQUAL(a.back(), 65537);
 
 	auto const& x = a.array();
-	(void)x;
+	(void) x;
 }
 
 BOOST_AUTO_TEST_CASE(modifying) {

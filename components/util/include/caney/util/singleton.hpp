@@ -13,7 +13,7 @@ __CANEY_UTILV1_BEGIN
  * create a shared default-constructed Value on demand, but doesn't
  * keep it alive if nothing else references it.
  */
-template<typename Value>
+template <typename Value>
 class singleton {
 public:
 	/** type to create singleton of */
@@ -31,9 +31,7 @@ public:
 	std::shared_ptr<value_type> get() {
 		std::lock_guard<std::mutex> lock(m_mutex);
 		std::shared_ptr<value_type> result = m_ref.lock();
-		if (!result) {
-			m_ref = result = std::make_shared<value_type>();
-		}
+		if (!result) { m_ref = result = std::make_shared<value_type>(); }
 		return result;
 	}
 

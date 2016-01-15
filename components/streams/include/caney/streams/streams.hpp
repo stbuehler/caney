@@ -5,20 +5,20 @@
 #include "caney/std/object.hpp"
 #include "caney/std/optional.hpp"
 
-#include "origin.hpp"
 #include "generic_chunks.hpp"
+#include "origin.hpp"
 
 namespace caney {
 	namespace streams {
 		inline namespace v1 {
 			class sink_base;
 
-			template<typename Chunk>
+			template <typename Chunk>
 			class sink;
 
 			class source_base;
 
-			template<typename Chunk>
+			template <typename Chunk>
 			class source;
 
 			class sink_base : private caney::object {
@@ -31,16 +31,16 @@ namespace caney {
 				std::shared_ptr<origin> const& get_origin() const;
 
 				virtual void on_new_origin(std::shared_ptr<origin> const& new_origin);
-				virtual void on_connected_source() { }
+				virtual void on_connected_source() {}
 
 			private:
-				template<typename Chunk>
+				template <typename Chunk>
 				friend class sink;
 
-				template<typename Chunk>
+				template <typename Chunk>
 				friend class source;
 
-				template<typename Source, typename Sink>
+				template <typename Source, typename Sink>
 				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
 
 				void set_new_origin(std::shared_ptr<origin> new_origin);
@@ -52,7 +52,7 @@ namespace caney {
 				origin_pause m_origin_pause;
 			};
 
-			template<typename Chunk>
+			template <typename Chunk>
 			class sink : public sink_base {
 			public:
 				using sink_t = sink<Chunk>;
@@ -90,10 +90,10 @@ namespace caney {
 				}
 
 			private:
-				template<typename FChunk>
+				template <typename FChunk>
 				friend class source;
 
-				template<typename Source, typename Sink>
+				template <typename Source, typename Sink>
 				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
 
 				std::shared_ptr<source_t> m_source;
@@ -104,20 +104,20 @@ namespace caney {
 				std::weak_ptr<origin> const& get_origin() const;
 
 			protected:
-				virtual void on_connected_sink() { }
+				virtual void on_connected_sink() {}
 
 			private:
-				template<typename Chunk>
+				template <typename Chunk>
 				friend class source;
 
-				template<typename Source, typename Sink>
+				template <typename Source, typename Sink>
 				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
 
 				// source might be the origin itself: don't keep itself alive here
 				std::weak_ptr<origin> m_origin;
 			};
 
-			template<typename Chunk>
+			template <typename Chunk>
 			class source : public source_base {
 			public:
 				using sink_t = sink<Chunk>;
@@ -180,10 +180,10 @@ namespace caney {
 				caney::optional<end_t> m_out_end;
 
 			private:
-				template<typename FChunk>
+				template <typename FChunk>
 				friend class sink;
 
-				template<typename Source, typename Sink>
+				template <typename Source, typename Sink>
 				friend void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to);
 
 				void send_pending() {
@@ -214,7 +214,7 @@ namespace caney {
 				std::shared_ptr<sink_t> m_sink;
 			};
 
-			template<typename ChunkIn, typename ChunkOut>
+			template <typename ChunkIn, typename ChunkOut>
 			class transform : public sink<ChunkIn>, public source<ChunkOut> {
 			public:
 				using sink_t = sink<ChunkIn>;
@@ -232,9 +232,7 @@ namespace caney {
 				}
 
 				void on_connected_source() override {
-					if (!source_t::get_sink()) {
-						sink_t::pause();
-					}
+					if (!source_t::get_sink()) { sink_t::pause(); }
 				}
 
 				void on_connected_sink() override {
@@ -242,7 +240,7 @@ namespace caney {
 				}
 			};
 
-			template<typename Chunk>
+			template <typename Chunk>
 			class filter : public transform<Chunk, Chunk> {
 			public:
 				using transform_t = transform<Chunk, Chunk>;
@@ -261,10 +259,10 @@ namespace caney {
 				}
 			};
 
-			template<typename Source>
+			template <typename Source>
 			struct source_traits {
 			private:
-				template<typename Chunk>
+				template <typename Chunk>
 				static Chunk helper_func(source<Chunk> const&);
 
 			public:
@@ -272,10 +270,10 @@ namespace caney {
 				using source_t = source<chunk_t>;
 			};
 
-			template<typename Sink>
+			template <typename Sink>
 			struct sink_traits {
 			private:
-				template<typename Chunk>
+				template <typename Chunk>
 				static Chunk helper_func(sink<Chunk> const&);
 
 			public:
@@ -283,7 +281,7 @@ namespace caney {
 				using sink_t = sink<chunk_t>;
 			};
 
-			template<typename Source, typename Sink>
+			template <typename Source, typename Sink>
 			void connect(std::shared_ptr<Source> from, std::shared_ptr<Sink> to) {
 				using from_traits = source_traits<Source>;
 				using to_traits = sink_traits<Sink>;
@@ -294,9 +292,7 @@ namespace caney {
 				std::shared_ptr<source_t> from_base{from};
 				std::shared_ptr<sink_t> to_base{to};
 
-				if (!from_base || !to_base || from_base->m_sink || to_base->m_source) {
-					std::terminate();
-				}
+				if (!from_base || !to_base || from_base->m_sink || to_base->m_source) { std::terminate(); }
 
 				from_base->m_sink = to_base;
 				to_base->m_source = from_base;

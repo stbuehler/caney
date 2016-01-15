@@ -30,44 +30,64 @@ public:
 	 * @brief size of buffer (length in bytes)
 	 */
 
-	size_t size() const { return m_buffer.size(); }
+	size_t size() const {
+		return m_buffer.size();
+	}
 
 	/**
 	 * @brief whether buffer is empty (i.e. zero length)
 	 */
-	bool empty() const { return 0 == size(); }
+	bool empty() const {
+		return 0 == size();
+	}
 
 	/**
 	 * @brief whether buffer is not empty (i.e. nonzero length)
 	 */
-	explicit operator bool() const { return !empty(); }
+	explicit operator bool() const {
+		return !empty();
+	}
 
 	/**
 	 * @brief pointer to first byte of data
 	 */
-	unsigned char* data() const { return const_cast<unsigned char*>(m_buffer.data()); }
+	unsigned char* data() const {
+		return const_cast<unsigned char*>(m_buffer.data());
+	}
 
 	/**
 	 @{
 	 * @brief standard iterator getter
 	 */
-	iterator begin() const { return data(); }
-	iterator end() const { return data() + size(); }
-	const_iterator cbegin() const { return data(); }
-	const_iterator cend() const { return data() + size(); }
+	iterator begin() const {
+		return data();
+	}
+	iterator end() const {
+		return data() + size();
+	}
+	const_iterator cbegin() const {
+		return data();
+	}
+	const_iterator cend() const {
+		return data() + size();
+	}
 	/** @} */
 
 	/**
 	 * @brief similar to begin() but returns iterator for `char` access
 	 *     instead of byte (unsigned char)
 	 */
-	char* char_begin() const { return reinterpret_cast<char*>(data()); }
+	char* char_begin() const {
+		return reinterpret_cast<char*>(data());
+	}
 
 	/**
 	 * @brief similar to end() but returns iterator for `char` access
 	 *     instead of byte (unsigned char)
 	 */
-	char* char_end() const { return reinterpret_cast<char*>(data()) + size(); }
+	char* char_end() const {
+		return reinterpret_cast<char*>(data()) + size();
+	}
 
 	/**
 	 * @brief return byte value at position `ndx` (terminates if range
@@ -125,12 +145,10 @@ protected:
 	mutable_buf() = default;
 
 	/** initialize with raw data */
-	explicit mutable_buf(unsigned char* data, size_t size)
-	: m_buffer(data, size) { }
+	explicit mutable_buf(unsigned char* data, size_t size) : m_buffer(data, size) {}
 
 	/** initialize with raw data */
-	explicit mutable_buf(char* data, size_t size)
-	: mutable_buf(reinterpret_cast<unsigned char*>(data), size) { }
+	explicit mutable_buf(char* data, size_t size) : mutable_buf(reinterpret_cast<unsigned char*>(data), size) {}
 
 	/**
 	 * destructor is not virtual as this class is supposed to be
@@ -175,7 +193,7 @@ private:
  * @brief implementation of @ref mutable_buf which does not keep
  *     referenced data alive - in other words, just "raw" pointers.
  */
-class raw_mutable_buf final: public mutable_buf {
+class raw_mutable_buf final : public mutable_buf {
 public:
 	/** @brief initialize empty buffer */
 	explicit raw_mutable_buf() = default;
@@ -184,15 +202,13 @@ public:
 	 * @brief initialize from raw pointers - make sure you keep the data
 	 *     around
 	 */
-	explicit raw_mutable_buf(unsigned char* data, std::size_t size)
-	: mutable_buf(data, size) { }
+	explicit raw_mutable_buf(unsigned char* data, std::size_t size) : mutable_buf(data, size) {}
 
 	/**
 	 * @brief initialize from raw pointers - make sure you keep the data
 	 *     around
 	 */
-	explicit raw_mutable_buf(char* data, std::size_t size)
-	: mutable_buf(data, size) { }
+	explicit raw_mutable_buf(char* data, std::size_t size) : mutable_buf(data, size) {}
 
 	/** @brief default copy constructor */
 	raw_mutable_buf(raw_mutable_buf const&) = default;
@@ -209,10 +225,8 @@ public:
 	 * @brief initialize with data contained in some container - make
 	 *     sure you keep the container around
 	 */
-	template<typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* =nullptr>
-	explicit raw_mutable_buf(Container& data)
-	: raw_mutable_buf(Storage::data(data), Storage::size(data)) {
-	}
+	template <typename Container, typename Storage = impl::buffer_storage<Container>, typename Storage::container_t* = nullptr>
+	explicit raw_mutable_buf(Container& data) : raw_mutable_buf(Storage::data(data), Storage::size(data)) {}
 
 	/**
 	 * @brief implicit conversion from `boost::asio::mutable_buffer`

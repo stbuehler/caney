@@ -47,17 +47,17 @@ private:
 
 	class pool : private boost::noncopyable {
 	public:
-		explicit pool(std::size_t size)
-		: m_size{size} {
-		}
+		explicit pool(std::size_t size) : m_size{size} {}
 		~pool();
 
 		/** @brief allocate object from (possible nullptr) pool */
 		static char* allocate(pool* p, std::size_t n);
 		/** @brief deallocate object in (possible nullptr) pool */
-		static void deallocate(pool *p, char* obj, std::size_t n);
+		static void deallocate(pool* p, char* obj, std::size_t n);
 
-		std::size_t size() const { return m_size; }
+		std::size_t size() const {
+			return m_size;
+		}
 
 	private:
 		const std::size_t m_size{0};
@@ -66,9 +66,7 @@ private:
 
 	class allocator_base {
 	public:
-		explicit allocator_base(std::weak_ptr<pool> p)
-		: m_pool(p) {
-		}
+		explicit allocator_base(std::weak_ptr<pool> p) : m_pool(p) {}
 
 		char* allocate(std::size_t n) {
 			return pool::allocate(m_pool.lock().get(), n);
@@ -88,7 +86,7 @@ public:
 	 *
 	 * Usable with `std::allocator_traits`.
 	 */
-	template<typename Value>
+	template <typename Value>
 	class allocator {
 	public:
 		/** the object type to allocate (required by Allocator concept) */
@@ -99,18 +97,14 @@ public:
 		 * @param base internal allocator_base containing weak reference to pool
 		 * @internal
 		 */
-		allocator(allocator_base const& base)
-		: m_base(base) {
-		}
+		allocator(allocator_base const& base) : m_base(base) {}
 
 		/**
 		 * @brief constructor to change value_type (required by Allocator concept for rebind)
 		 * @param other other constructor to share the pool from
 		 */
-		template<typename Other>
-		allocator(allocator<Other> const& other)
-		: m_base(other.m_base) {
-		}
+		template <typename Other>
+		allocator(allocator<Other> const& other) : m_base(other.m_base) {}
 
 		/**
 		 * @brief allocate `n` objects of type @ref value_type (required by Allocator concept)
@@ -137,7 +131,7 @@ public:
 	private:
 		allocator_base m_base;
 
-		template<typename Other>
+		template <typename Other>
 		friend class allocator;
 	};
 
@@ -170,11 +164,11 @@ private:
  * @brief compare two pool allocators; all pool allocators are compatible and therefor "equal" -
  * if the size doesn't match they just won't use the cache.
  */
-template<typename A, typename B>
+template <typename A, typename B>
 bool operator==(allocator_pool::allocator<A> const&, allocator_pool::allocator<B> const&) {
 	return true;
 }
-template<typename A, typename B>
+template <typename A, typename B>
 bool operator!=(allocator_pool::allocator<A> const&, allocator_pool::allocator<B> const&) {
 	return false;
 }

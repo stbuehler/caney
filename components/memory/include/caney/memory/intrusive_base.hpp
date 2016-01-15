@@ -16,20 +16,20 @@
 
 __CANEY_MEMORYV1_BEGIN
 
-template<typename Object, typename CounterPolicyT = boost::thread_safe_counter, typename Allocator = std::allocator<void>>
+template <typename Object, typename CounterPolicyT = boost::thread_safe_counter, typename Allocator = std::allocator<void>>
 class intrusive_base;
 
 namespace impl {
 	/* wrap allocator to allow "late" construction; that
 	 * the allocator doesn't need to go through all constructors
 	 */
-	template<typename Allocator>
+	template <typename Allocator>
 	class intrusive_allocator {
 	private:
 		union inner {
-			inner() { }
+			inner() {}
 			inner(inner const&) = delete;
-			~inner() { }
+			~inner() {}
 			Allocator m_allocator;
 		};
 		inner m_inner;
@@ -49,14 +49,14 @@ namespace impl {
 	};
 
 	/* wrap counter to prevent copying */
-	template<typename CounterPolicyT>
+	template <typename CounterPolicyT>
 	class intrusive_counter {
 	private:
 		using counter_type = typename CounterPolicyT::type;
 		counter_type m_counter{0};
 
 	public:
-		intrusive_counter() noexcept { }
+		intrusive_counter() noexcept {}
 		intrusive_counter(intrusive_counter const&) = delete;
 		~intrusive_counter() = default;
 
@@ -74,50 +74,50 @@ namespace impl {
 	};
 
 	// actual traits type
-	template<typename Object, typename CounterPolicyT, typename Allocator>
+	template <typename Object, typename CounterPolicyT, typename Allocator>
 	struct intrusive_traits_impl {
 		using object_t = Object;
 		using counter_policy_t = CounterPolicyT;
 		using allocator_t = Allocator;
 		using base_t = intrusive_base<Object, CounterPolicyT, Allocator>;
 
-		template<typename Derived>
-		static void add_ref(Derived *p) noexcept;
+		template <typename Derived>
+		static void add_ref(Derived* p) noexcept;
 
-		template<typename Derived>
-		static void release(Derived *p) noexcept;
+		template <typename Derived>
+		static void release(Derived* p) noexcept;
 
-		template<typename Derived>
+		template <typename Derived>
 		static void init_allocator(Derived* p, Allocator const& alloc) noexcept;
 	};
 
 	// if `Base` is a `intrusive_base`, `::type` type member will be `intrusive_traits_impl`
-	template<typename Base>
-	struct intrusive_traits_base {
-	};
+	template <typename Base>
+	struct intrusive_traits_base {};
 
-	template<typename Object, typename CounterPolicyT, typename Allocator>
+	template <typename Object, typename CounterPolicyT, typename Allocator>
 	struct intrusive_traits_base<intrusive_base<Object, CounterPolicyT, Allocator>> {
 		using type = intrusive_traits_impl<Object, CounterPolicyT, Allocator>;
 	};
 
 	// detect a `intrusive_base<...>` base type of `Derived`
-	template<typename Derived>
+	template <typename Derived>
 	struct intrusive_traits_detect {
 	private:
-		template<typename T, typename Object, typename CounterPolicyT, typename Allocator>
+		template <typename T, typename Object, typename CounterPolicyT, typename Allocator>
 		static intrusive_base<Object, CounterPolicyT, Allocator> test(intrusive_base<Object, CounterPolicyT, Allocator> const*);
-		template<typename T>
+		template <typename T>
 		static void test(void const*, T* = nullptr);
+
 	public:
 		// `void` or the `intrusive_base<...>` base type of `Derived`
-		using base = decltype(test<Derived>((Derived*)nullptr));
+		using base = decltype(test<Derived>((Derived*) nullptr));
 		// `type` will have a `::type` type member if `base` is not `void`
 		using type = intrusive_traits_base<base>;
 	};
 
 	// get traits for a `Derived` type (must be derived from `intrusive_base<...>` or this fails)
-	template<typename Derived>
+	template <typename Derived>
 	using intrusive_traits = typename intrusive_traits_detect<Derived>::type::type;
 }
 
@@ -131,14 +131,13 @@ namespace impl {
  * @tparam CounterPolicyT same as CounterPolicyT `boost::intrusive_ref_counter`
  * @tparam Allocator      allocator to allocate and deallocate objects with
  */
-template<typename Object, typename CounterPolicyT /* = boost::thread_safe_counter */, typename Allocator /* = std::allocator<void> */>
+template <typename Object, typename CounterPolicyT /* = boost::thread_safe_counter */, typename Allocator /* = std::allocator<void> */>
 class intrusive_base {
 private:
 	mutable impl::intrusive_counter<CounterPolicyT> m_counter;
 	mutable impl::intrusive_allocator<Allocator> m_allocator;
 
-	friend
-	struct impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>;
+	friend struct impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>;
 
 protected:
 	/**
@@ -171,7 +170,7 @@ public:
 	 * a derived class like `Derived::allocate` - call `Derived::allocate<Derived>`
 	 * or `Object::allocate<Derived>` instead.
 	 */
-	template<typename Derived = Object, typename... Args>
+	template <typename Derived = Object, typename... Args>
 	static boost::intrusive_ptr<Derived> allocate(Allocator const& alloc, Args&&... args);
 
 	/**
@@ -182,26 +181,26 @@ public:
 	 * a derived class like `Derived::allocate` - call `Derived::create<Derived>`
 	 * or `Object::create<Derived>` instead.
 	 */
-	template<typename Derived = Object, typename... Args>
+	template <typename Derived = Object, typename... Args>
 	static boost::intrusive_ptr<Derived> create(Args&&... args);
 };
 
-template<typename Object, typename CounterPolicyT, typename Allocator>
-template<typename Derived>
+template <typename Object, typename CounterPolicyT, typename Allocator>
+template <typename Derived>
 /* static */
-void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::add_ref(Derived *p) noexcept {
+void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::add_ref(Derived* p) noexcept {
 	p->base_t::m_counter.increment();
 }
 
-template<typename Object, typename CounterPolicyT, typename Allocator>
-template<typename Derived>
+template <typename Object, typename CounterPolicyT, typename Allocator>
+template <typename Derived>
 /* static */
-void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::release(Derived *p) noexcept {
+void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::release(Derived* p) noexcept {
 	if (0 == p->base_t::m_counter.decrement()) {
 		using derived_no_cv = typename std::remove_cv<Derived>::type;
 
-		static_assert(std::is_same<derived_no_cv, object_t>::value
-			|| std::has_virtual_destructor<object_t>::value,
+		static_assert(
+			std::is_same<derived_no_cv, object_t>::value || std::has_virtual_destructor<object_t>::value,
 			"Can only derive from Object if it has a virtual destructor");
 
 		using derived_alloc_t = typename std::allocator_traits<allocator_t>::template rebind_alloc<derived_no_cv>;
@@ -215,8 +214,8 @@ void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::release(Der
 	}
 }
 
-template<typename Object, typename CounterPolicyT, typename Allocator>
-template<typename Derived>
+template <typename Object, typename CounterPolicyT, typename Allocator>
+template <typename Derived>
 /* static */
 void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::init_allocator(Derived* p, Allocator const& alloc) noexcept {
 	p->base_t::m_allocator.init_allocator(alloc);
@@ -226,7 +225,7 @@ void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::init_alloca
  * @brief helper function for boost::intrusive_ptr reference counter management
  * @internal
  */
-template<typename Derived, typename traits = impl::intrusive_traits<Derived>>
+template <typename Derived, typename traits = impl::intrusive_traits<Derived>>
 void intrusive_ptr_add_ref(Derived* p) noexcept {
 	traits::add_ref(p);
 }
@@ -235,7 +234,7 @@ void intrusive_ptr_add_ref(Derived* p) noexcept {
  * @brief helper function for boost::intrusive_ptr reference counter management
  * @internal
  */
-template<typename Derived, typename traits = impl::intrusive_traits<Derived>>
+template <typename Derived, typename traits = impl::intrusive_traits<Derived>>
 void intrusive_ptr_release(Derived* p) noexcept {
 	traits::release(p);
 }
@@ -247,7 +246,7 @@ void intrusive_ptr_release(Derived* p) noexcept {
  * @param args     Arguments to pass to `Derived` constructor
  * @tparam Derived type of object to create
  */
-template<typename Derived, typename traits = impl::intrusive_traits<Derived>, typename... Args>
+template <typename Derived, typename traits = impl::intrusive_traits<Derived>, typename... Args>
 boost::intrusive_ptr<Derived> allocate_intrusive(typename traits::allocator_t const& alloc, Args&&... args) {
 	using alloc_t = typename traits::allocator_t;
 	using derived_alloc_t = typename std::allocator_traits<alloc_t>::template rebind_alloc<Derived>;
@@ -273,22 +272,22 @@ boost::intrusive_ptr<Derived> allocate_intrusive(typename traits::allocator_t co
  * @param args     Arguments to forward to contructor of `Derived`
  * @tparam Derived type of object to create
  */
-template<typename Derived, typename traits = impl::intrusive_traits<Derived>, typename... Args>
+template <typename Derived, typename traits = impl::intrusive_traits<Derived>, typename... Args>
 boost::intrusive_ptr<Derived> make_intrusive(Args&&... args) {
 	using alloc_t = typename traits::allocator_t;
 	return allocate_intrusive<Derived>(alloc_t(), std::forward<Args>(args)...);
 }
 
-template<typename Object, typename CounterPolicyT, typename Allocator>
-template<typename Derived, typename... Args>
+template <typename Object, typename CounterPolicyT, typename Allocator>
+template <typename Derived, typename... Args>
 /* static */
 boost::intrusive_ptr<Derived> intrusive_base<Object, CounterPolicyT, Allocator>::allocate(Allocator const& alloc, Args&&... args) {
 	static_assert(std::is_base_of<Object, Derived>::value, "only create derived objects");
 	return allocate_intrusive<Derived>(alloc, std::forward<Args>(args)...);
 }
 
-template<typename Object, typename CounterPolicyT, typename Allocator>
-template<typename Derived, typename... Args>
+template <typename Object, typename CounterPolicyT, typename Allocator>
+template <typename Derived, typename... Args>
 /* static */
 boost::intrusive_ptr<Derived> intrusive_base<Object, CounterPolicyT, Allocator>::create(Args&&... args) {
 	static_assert(std::is_base_of<Object, Derived>::value, "only create derived objects");

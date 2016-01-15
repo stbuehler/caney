@@ -18,9 +18,7 @@ namespace caney {
 				void register_sigbus() {
 					static std::once_flag register_sigbus;
 
-					std::call_once(register_sigbus, []() {
-						std::signal(SIGBUS, &sigbus_func);
-					});
+					std::call_once(register_sigbus, []() { std::signal(SIGBUS, &sigbus_func); });
 				}
 			} // anonymous namespace
 

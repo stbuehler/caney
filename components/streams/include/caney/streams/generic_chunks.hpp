@@ -10,7 +10,7 @@ namespace caney {
 				Aborted,
 			};
 
-			template<typename Chunk>
+			template <typename Chunk>
 			struct chunk_traits_t {
 				using chunks_t = std::list<Chunk>;
 

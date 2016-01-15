@@ -22,7 +22,7 @@ __CANEY_STDV1_BEGIN
  *
  * @tparam ValueType type of possibly contained value
  */
-template<typename ValueType>
+template <typename ValueType>
 class optional_ptr {
 public:
 	/** type of possibly contained value */
@@ -41,16 +41,14 @@ public:
 	 *
 	 * @post `!*this`
 	 */
-	constexpr optional_ptr() noexcept {
-	}
+	constexpr optional_ptr() noexcept {}
 
 	/**
 	 * @brief initialize as disengaged
 	 *
 	 * @post `!*this`
 	 */
-	/* implicit */ constexpr optional_ptr(nullopt_t const&) noexcept {
-	}
+	/* implicit */ constexpr optional_ptr(nullopt_t const&) noexcept {}
 
 	/**
 	 * @brief If @p other is engaged copy value from `*other`, otherwise
@@ -59,9 +57,7 @@ public:
 	 * @post `bool(*this) == bool(other)`
 	 */
 	optional_ptr(optional_ptr const& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value) {
-		if (other) {
-			m_storage.reset(new value_type(*other));
-		}
+		if (other) { m_storage.reset(new value_type(*other)); }
 	}
 
 	/**
@@ -94,7 +90,7 @@ public:
 	 *
 	 * @post `*this`
 	 */
-	template<typename... Args>
+	template <typename... Args>
 	explicit optional_ptr(in_place_t, Args&&... args) {
 		m_storage.reset(new value_type(std::forward<Args>(args)...));
 	}
@@ -105,7 +101,7 @@ public:
 	 *
 	 * @post `*this`
 	 */
-	template<typename ILValue, typename... Args>
+	template <typename ILValue, typename... Args>
 	explicit optional_ptr(in_place_t, std::initializer_list<ILValue> il, Args&&... args) {
 		m_storage.reset(new value_type(il, std::forward<Args>(args)...));
 	}
@@ -132,22 +128,24 @@ public:
 	 *
 	 * @post `bool(*this) == bool(other)`
 	 */
-	optional_ptr& operator=(optional_ptr const& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value && std::is_nothrow_copy_assignable<value_type>::value) {
+	optional_ptr&
+	operator=(optional_ptr const& other) noexcept(std::is_nothrow_copy_constructible<value_type>::value&& std::is_nothrow_copy_assignable<value_type>::value) {
 		if (other) {
-			return *this = *other;
+			return * this = *other;
 		} else {
-			return *this = nullopt;
+			return * this = nullopt;
 		}
 	}
 
 	/**
 	 * @brief if other is engaged move storage, otherwise `*this = nullopt`
 	 */
-	optional_ptr& operator=(optional_ptr&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value && std::is_nothrow_move_assignable<value_type>::value) {
+	optional_ptr&
+	operator=(optional_ptr&& other) noexcept(std::is_nothrow_move_constructible<value_type>::value&& std::is_nothrow_move_assignable<value_type>::value) {
 		if (other) {
-			return *this = *std::move(other);
+			return * this = *std::move(other);
 		} else {
-			return *this = nullopt;
+			return * this = nullopt;
 		}
 	}
 
@@ -157,8 +155,9 @@ public:
 	 *
 	 * @post `*this`
 	 */
-	template<typename Value, std::enable_if_t<std::is_same<value_type, std::decay_t<Value>>::value>* = nullptr>
-	optional_ptr& operator=(Value&& value) noexcept(std::is_nothrow_constructible<value_type, Value&&>::value && std::is_nothrow_assignable<value_type&, Value&&>::value) {
+	template <typename Value, std::enable_if_t<std::is_same<value_type, std::decay_t<Value>>::value>* = nullptr>
+	optional_ptr&
+	operator=(Value&& value) noexcept(std::is_nothrow_constructible<value_type, Value&&>::value&& std::is_nothrow_assignable<value_type&, Value&&>::value) {
 		if (m_storage) {
 			*m_storage = std::forward<Value>(value);
 		} else {
@@ -172,7 +171,7 @@ public:
 	 *
 	 * @post `*this`
 	 */
-	template<typename... Args>
+	template <typename... Args>
 	void emplace(Args&&... args) {
 		m_storage.reset(new value_type(std::forward<Args>(args)...));
 	}
@@ -182,7 +181,7 @@ public:
 	 *
 	 * @post `*this`
 	 */
-	template<typename ILValue, typename... Args>
+	template <typename ILValue, typename... Args>
 	void emplace(std::initializer_list<ILValue> il, Args&&... args) {
 		m_storage.reset(new value_type(il, std::forward<Args>(args)...));
 	}
@@ -287,7 +286,7 @@ public:
 	 * @brief get copy of value; returns @p def_value if `this` is
 	 *     disengaged
 	 */
-	template<typename Value>
+	template <typename Value>
 	constexpr value_type value_or(Value&& def_value) const& {
 		return m_storage ? *m_storage : std::forward<Value>(def_value);
 	}
@@ -296,7 +295,7 @@ public:
 	 * @brief extract value with move; returns @p def_value if `this` is
 	 *     disengaged
 	 */
-	template<typename Value>
+	template <typename Value>
 	CANEY_RELAXED_CONSTEXPR value_type value_or(Value&& def_value) && {
 		return m_storage ? std::move(*m_storage) : std::forward<Value>(def_value);
 	}
@@ -308,27 +307,27 @@ public:
  * @brief relational operators on @ref optional (nullopt is less than
  *     any other value)
  */
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator==(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return a ? b && (*a == *b) : /* !a && */ !b;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator!=(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return !(a == b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return b && (!a || (*a < *b));
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return (b < a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<=(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return !(b < a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>=(optional_ptr<ValueType> const& a, optional_ptr<ValueType> const& b) {
 	return !(a < b);
 }
@@ -342,51 +341,51 @@ constexpr bool operator>=(optional_ptr<ValueType> const& a, optional_ptr<ValueTy
  * @brief relational operators on @ref optional_ptr and @ref nullopt_t
  *     (nullopt is less than any other value)
  */
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator==(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return !a;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator==(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return !a;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator!=(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return bool(a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator!=(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return bool(a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return false;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return bool(a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<=(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return !a;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<=(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return true;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return bool(a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return false;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>=(optional_ptr<ValueType> const& a, nullopt_t) noexcept {
 	return true;
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>=(nullopt_t, optional_ptr<ValueType> const& a) noexcept {
 	return !a;
 }
@@ -400,51 +399,51 @@ constexpr bool operator>=(nullopt_t, optional_ptr<ValueType> const& a) noexcept 
  * @brief relational operators on @ref optional_ptr and @ref
  *     optional_ptr::value_type (nullopt is less than any other value)
  */
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator==(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return a && (*a == b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator==(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return b && (a == *b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator!=(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return !(a == b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator!=(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return !(a == b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return !a || (*a < b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return b && (a < *b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<=(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return !(b > a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator<=(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return !(b > a);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return !a && (*a > b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return b || (a > *b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>=(optional_ptr<ValueType> const& a, ValueType const& b) {
 	return !(a < b);
 }
-template<typename ValueType>
+template <typename ValueType>
 constexpr bool operator>=(ValueType const& a, optional_ptr<ValueType> const& b) {
 	return !(a < b);
 }
@@ -456,7 +455,7 @@ constexpr bool operator>=(ValueType const& a, optional_ptr<ValueType> const& b) 
 /**
  * @brief swap two values
  */
-template<typename ValueType>
+template <typename ValueType>
 void swap(optional_ptr<ValueType>& a, optional_ptr<ValueType>& b) noexcept(noexcept(a.swap(b))) {
 	a.swap(b);
 }
@@ -464,7 +463,7 @@ void swap(optional_ptr<ValueType>& a, optional_ptr<ValueType>& b) noexcept(noexc
 /**
  * @brief create engaged optional_ptr from inner value
  */
-template<typename Value>
+template <typename Value>
 constexpr optional_ptr<std::decay_t<Value>> make_optional_ptr(Value&& v) {
 	return optional_ptr<std::decay_t<Value>>(in_place, std::forward<Value>(v));
 }
@@ -473,13 +472,13 @@ __CANEY_STDV1_END
 
 // X.Y.12, hash support
 namespace std {
-	template<class Key>
+	template <class Key>
 	struct hash;
 
 	/**
 	 * `std::hash` implementation for @ref caney::optional_ptr
 	 */
-	template<typename ValueType>
+	template <typename ValueType>
 	struct hash<caney::optional_ptr<ValueType>> : private hash<ValueType> {
 	private:
 		using value_hash_t = hash<ValueType>;

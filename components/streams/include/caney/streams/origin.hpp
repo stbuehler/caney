@@ -44,9 +44,7 @@ namespace caney {
 			private:
 				friend class origin;
 
-				origin_pause(std::shared_ptr<origin::pause_watcher> watcher)
-				: m_watcher(std::move(watcher)) {
-				}
+				origin_pause(std::shared_ptr<origin::pause_watcher> watcher) : m_watcher(std::move(watcher)) {}
 
 				std::shared_ptr<origin::pause_watcher> m_watcher;
 			};

@@ -23,7 +23,6 @@ unique_buf mutable_buf::copy() const {
 /* raw_mutable_buf */
 
 raw_mutable_buf::raw_mutable_buf(boost::asio::mutable_buffer data)
-: raw_mutable_buf(boost::asio::buffer_cast<unsigned char*>(data), boost::asio::buffer_size(data)) {
-}
+: raw_mutable_buf(boost::asio::buffer_cast<unsigned char*>(data), boost::asio::buffer_size(data)) {}
 
 __CANEY_MEMORYV1_END

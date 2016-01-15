@@ -1,19 +1,18 @@
-#include <caney/util/move_arg.hpp>
 #include <caney/util/dispatcher.hpp>
+#include <caney/util/move_arg.hpp>
 
 #include <iostream>
 
 #include <functional>
 
 #include <boost/asio.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/test/test_case_template.hpp>
 #include <boost/mpl/list.hpp>
+#include <boost/test/test_case_template.hpp>
+#include <boost/test/unit_test.hpp>
 
 namespace {
 
-	class copied_exception : std::exception {
-	};
+	class copied_exception : std::exception {};
 
 	class nocopy {
 	public:
@@ -70,7 +69,7 @@ namespace {
 		bool has_data = true;
 	};
 
-	template<typename Arg>
+	template <typename Arg>
 	class test_moving_arg {
 	public:
 		void callback_by_value(Arg arg) {
@@ -90,7 +89,7 @@ namespace {
 			BOOST_CHECK_MESSAGE(!arg, "content cleared");
 		}
 
-		template<typename Callback>
+		template <typename Callback>
 		void test_direct_call(Callback&& callback) {
 			std::function<void(Arg)> bound_callback = std::bind(callback, this, std::placeholders::_1);
 
@@ -105,7 +104,7 @@ namespace {
 			BOOST_CHECK_EQUAL(callback_counter, 2);
 		}
 
-		template<typename Callback>
+		template <typename Callback>
 		void test_strand_wrapped_call(Callback&& callback) {
 			boost::asio::io_service service;
 			boost::asio::strand strand(service);
@@ -113,7 +112,7 @@ namespace {
 			std::function<void(Arg)> wrapped_callback = caney::util::wrap_dispatch(strand, bound_callback);
 			std::function<void(caney::util::move_arg<Arg>)> wrapped_callback_movearg = strand.wrap(bound_callback);
 
-			service.post([=,&service]() {
+			service.post([=, &service]() {
 				callback_counter = 0;
 				BOOST_MESSAGE("callback call 1");
 				wrapped_callback(Arg());

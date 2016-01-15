@@ -9,11 +9,9 @@ __CANEY_STDV1_BEGIN
 /**
  * @brief constexpr version of the std::addressof() function
  */
-template<typename T>
+template <typename T>
 constexpr T* addressof(T& v) {
-	return reinterpret_cast<T*>(
-		&const_cast<char&>(
-			reinterpret_cast<const volatile char&>(v)));
+	return reinterpret_cast<T*>(&const_cast<char&>(reinterpret_cast<const volatile char&>(v)));
 }
 
 __CANEY_STDV1_END

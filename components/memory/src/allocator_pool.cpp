@@ -3,7 +3,7 @@
 __CANEY_MEMORYV1_BEGIN
 
 namespace {
-	void mem_free(char *obj, std::size_t n) {
+	void mem_free(char* obj, std::size_t n) {
 		std::allocator<char>().deallocate(obj, n);
 	}
 
@@ -15,20 +15,20 @@ namespace {
 allocator_pool::pool::~pool() {
 	auto front = m_front.synchronize();
 	while (nullptr != *front) {
-		chunk_link *elem = *front;
+		chunk_link* elem = *front;
 		*front = elem->next;
 		mem_free(reinterpret_cast<char*>(elem), m_size);
 	}
 }
 
 // static
-char* allocator_pool::pool::allocate(pool *p, std::size_t n) {
+char* allocator_pool::pool::allocate(pool* p, std::size_t n) {
 	n = std::max(n, sizeof(chunk_link));
 
 	if (nullptr != p && p->m_size == n) {
 		auto front = p->m_front.synchronize();
 		if (nullptr != *front) {
-			chunk_link *elem = *front;
+			chunk_link* elem = *front;
 			*front = elem->next;
 			return reinterpret_cast<char*>(elem);
 		}
@@ -37,11 +37,11 @@ char* allocator_pool::pool::allocate(pool *p, std::size_t n) {
 }
 
 // static
-void allocator_pool::pool::deallocate(pool *p, char *obj, std::size_t n) {
+void allocator_pool::pool::deallocate(pool* p, char* obj, std::size_t n) {
 	n = std::max(n, sizeof(chunk_link));
 
 	if (nullptr != p && p->m_size == n) {
-		chunk_link *elem = reinterpret_cast<chunk_link*>(obj);
+		chunk_link* elem = reinterpret_cast<chunk_link*>(obj);
 		auto front = p->m_front.synchronize();
 		elem->next = *front;
 		*front = elem;

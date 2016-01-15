@@ -18,7 +18,7 @@ __CANEY_UTILV1_BEGIN
  *
  * use wrap_dispatch/wrap_post from dispatcher.hpp instead if possible.
  */
-template<typename T>
+template <typename T>
 class move_arg {
 public:
 	/** wrapped type */
@@ -27,17 +27,13 @@ public:
 	/**
 	 * @brief implicit construction from wrapped value
 	 */
-	move_arg(value_type&& value)
-	: m_value(std::move(value)) {
-	}
+	move_arg(value_type&& value) : m_value(std::move(value)) {}
 
 	/**
 	 * @brief move instead of copy!
 	 * @param other wrapped value to move from
 	 */
-	move_arg(move_arg const& other)
-	: m_value(std::move(other.m_value)) {
-	}
+	move_arg(move_arg const& other) : m_value(std::move(other.m_value)) {}
 
 	/**
 	 * @brief deleted, copy assignment not allowed
