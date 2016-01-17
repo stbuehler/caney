@@ -5,6 +5,7 @@
 #include "file_size.hpp"
 #include "internal.hpp"
 
+#include <functional>
 #include <memory>
 #include <sys/stat.h>
 #include <system_error>
@@ -12,6 +13,12 @@
 #include <boost/noncopyable.hpp>
 
 __CANEY_STREAMSV1_BEGIN
+
+/** @brief whether to follow symlinks when opening a file */
+enum class symlink_policy {
+	no_follow,
+	follow,
+};
 
 /** @brief manages a file descriptor (either representing an open file or "-1") */
 class unix_file_descriptor final : private boost::noncopyable {
@@ -55,7 +62,7 @@ class unix_file_handle : public std::enable_shared_from_this<unix_file_handle>, 
 private:
 	//! @cond INTERNAL
 	struct info : private boost::noncopyable {
-		explicit info(std::string const& filename, struct ::stat const& st, bool temporary);
+		explicit info(std::string&& filename, struct ::stat const& st, bool temporary);
 		~info();
 
 		std::string const m_filename;
@@ -69,7 +76,7 @@ public:
 	using file_descriptor_t = unix_file_descriptor;
 
 	//! @cond INTERNAL
-	explicit unix_file_handle(private_tag_t, file_descriptor_t&& fd, std::string const& filename, struct ::stat const& st, bool temporary);
+	explicit unix_file_handle(private_tag_t, file_descriptor_t&& fd, std::string&& filename, struct ::stat const& st, bool temporary);
 	explicit unix_file_handle(private_tag_t, file_descriptor_t&& fd, std::shared_ptr<info> const& parentInfo);
 	//! @endcond INTERNAL
 
@@ -99,9 +106,13 @@ public:
 	/** @brief create a new file handle with an independent @ref file_descriptor() */
 	std::shared_ptr<unix_file_handle> duplicate(std::error_code& ec) const;
 
-	static std::shared_ptr<unix_file_handle> open_file(std::string const& filename, std::error_code& ec);
+	/** @brief open regular file */
+	static std::shared_ptr<unix_file_handle>
+	open_file(std::string const& filename, symlink_policy policy, std::error_code& ec);
 
-	static std::shared_ptr<unix_file_handle> open_temporary_file(std::string const& filename, std::error_code& ec);
+	/** @brief open temporary regular file (delete on close) */
+	static std::shared_ptr<unix_file_handle>
+	open_temporary_file(std::string const& filename, symlink_policy policy, std::error_code& ec);
 
 private:
 	file_descriptor_t const m_fd;
