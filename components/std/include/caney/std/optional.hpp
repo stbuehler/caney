@@ -362,11 +362,8 @@ public:
 	 * @brief swap two values
 	 */
 	/* `noexcept(swap(std::declval<value_type&>(), std::declval<value_type&>()))` only works in std:: and std::-nested namespaces.
-	 * using `noexcept(swap(std::declval<std::tuple<value_type>&>(), std::declval<std::tuple<value_type>&>()))` instead - tuples should have the right thing.
 	 */
-	void swap(optional& other) noexcept(
-		std::is_nothrow_move_constructible<value_type>::value&& noexcept(
-			swap(std::declval<std::tuple<value_type>&>(), std::declval<std::tuple<value_type>&>()))) {
+	void swap(optional& other) /* noexcept(is_nothrow_move_constructible<T>::value && noexcept(swap(declval<T&>(), declval<T&>()))) */ {
 		if (*this) {
 			if (other) {
 				using std::swap;
