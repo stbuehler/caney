@@ -189,14 +189,16 @@ template <typename Object, typename CounterPolicyT, typename Allocator>
 template <typename Derived>
 /* static */
 void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::add_ref(Derived* p) noexcept {
-	p->base_t::m_counter.increment();
+	base_t const* const b = p;
+	b->m_counter.increment();
 }
 
 template <typename Object, typename CounterPolicyT, typename Allocator>
 template <typename Derived>
 /* static */
 void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::release(Derived* p) noexcept {
-	if (0 == p->base_t::m_counter.decrement()) {
+	base_t const* const b = p;
+	if (0 == b->m_counter.decrement()) {
 		using derived_no_cv = typename std::remove_cv<Derived>::type;
 
 		static_assert(
@@ -205,10 +207,10 @@ void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::release(Der
 
 		using derived_alloc_t = typename std::allocator_traits<allocator_t>::template rebind_alloc<derived_no_cv>;
 		using derived_alloc_traits = std::allocator_traits<derived_alloc_t>;
-		derived_alloc_t derived_alloc(p->base_t::m_allocator.allocator());
+		derived_alloc_t derived_alloc(b->m_allocator.allocator());
 		derived_no_cv* ptr = const_cast<derived_no_cv*>(p);
 
-		p->base_t::m_allocator.clear_allocator();
+		b->m_allocator.clear_allocator();
 		derived_alloc_traits::destroy(derived_alloc, ptr);
 		derived_alloc_traits::deallocate(derived_alloc, ptr, 1);
 	}
@@ -218,7 +220,8 @@ template <typename Object, typename CounterPolicyT, typename Allocator>
 template <typename Derived>
 /* static */
 void impl::intrusive_traits_impl<Object, CounterPolicyT, Allocator>::init_allocator(Derived* p, Allocator const& alloc) noexcept {
-	p->base_t::m_allocator.init_allocator(alloc);
+	base_t const* const b = p;
+	b->m_allocator.init_allocator(alloc);
 }
 
 /**
